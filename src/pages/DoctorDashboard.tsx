@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -5,9 +6,13 @@ import { Brain, Activity, Bell, LogOut, Users, TrendingUp, AlertCircle } from "l
 import { useNavigate } from "react-router-dom";
 import PatientCard from "@/components/dashboard/PatientCard";
 import VitalsChart from "@/components/dashboard/VitalsChart";
+import AIInsights from "@/components/dashboard/AIInsights";
+import EmergencyAlert from "@/components/dashboard/EmergencyAlert";
+import { useVitalsStream } from "@/hooks/useVitalsStream";
 
 const DoctorDashboard = () => {
   const navigate = useNavigate();
+  const [emergencyAlert, setEmergencyAlert] = useState<{ patient: string; message: string } | null>(null);
 
   const patients = [
     {
@@ -54,22 +59,69 @@ const DoctorDashboard = () => {
     },
   ];
 
-  const alerts = [
-    {
-      id: 1,
-      patient: "Maria Garcia",
-      message: "Elevated heart rate detected",
-      severity: "critical" as const,
-      time: "2 min ago"
-    },
-    {
-      id: 2,
-      patient: "Robert Chen",
-      message: "Blood pressure above normal range",
-      severity: "warning" as const,
-      time: "15 min ago"
-    },
-  ];
+  // Real-time vitals streaming
+  const { vitalsData, alerts: streamAlerts } = useVitalsStream(patients);
+
+  // Generate AI insights based on vitals
+  const aiInsights = Array.from(vitalsData.values()).flatMap((patientVitals) => {
+    const patient = patients.find(p => p.id === patientVitals.patientId);
+    if (!patient) return [];
+
+    const latest = patientVitals.readings[patientVitals.readings.length - 1];
+    const insights = [];
+
+    if (latest.heartRate > 100) {
+      insights.push({
+        id: `${patient.id}-hr-trend`,
+        type: 'trend' as const,
+        message: `${patient.name}: Heart rate elevated (${latest.heartRate} bpm) - possible stress episode`,
+        severity: latest.heartRate > 120 ? 'critical' as const : 'warning' as const,
+        timestamp: '2 min ago',
+      });
+    }
+
+    if (latest.bloodPressure.systolic > 140) {
+      insights.push({
+        id: `${patient.id}-bp-anomaly`,
+        type: 'anomaly' as const,
+        message: `${patient.name}: Blood pressure spike detected (${latest.bloodPressure.systolic}/${latest.bloodPressure.diastolic})`,
+        severity: latest.bloodPressure.systolic > 160 ? 'critical' as const : 'warning' as const,
+        timestamp: 'Just now',
+      });
+    }
+
+    return insights;
+  }).slice(0, 5);
+
+  // Trigger emergency alert for critical conditions
+  useEffect(() => {
+    const criticalAlerts = streamAlerts.filter(a => a.severity === 'critical');
+    if (criticalAlerts.length > 0 && !emergencyAlert) {
+      setEmergencyAlert({
+        patient: criticalAlerts[0].patient,
+        message: criticalAlerts[0].message,
+      });
+    }
+  }, [streamAlerts, emergencyAlert]);
+
+  // Update patient vitals with real-time data
+  const updatedPatients = patients.map(patient => {
+    const vitals = vitalsData.get(patient.id);
+    if (!vitals) return patient;
+
+    const latest = vitals.readings[vitals.readings.length - 1];
+    return {
+      ...patient,
+      status: vitals.status,
+      lastReading: 'Just now',
+      vitals: {
+        heartRate: latest.heartRate,
+        bloodPressure: `${latest.bloodPressure.systolic}/${latest.bloodPressure.diastolic}`,
+        temperature: latest.temperature,
+        oxygen: latest.oxygen,
+      },
+    };
+  });
 
   return (
     <div className="min-h-screen bg-muted">
@@ -167,7 +219,7 @@ const DoctorDashboard = () => {
                 <CardDescription>Patients requiring immediate attention</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {alerts.map((alert) => (
+                {streamAlerts.slice(0, 5).map((alert) => (
                   <div 
                     key={alert.id} 
                     className="flex items-center justify-between p-4 rounded-lg border border-border bg-background"
@@ -197,8 +249,12 @@ const DoctorDashboard = () => {
                 <CardDescription>Real-time monitoring status</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {patients.map((patient) => (
-                  <PatientCard key={patient.id} patient={patient} />
+                {updatedPatients.map((patient) => (
+                  <PatientCard 
+                    key={patient.id} 
+                    patient={patient}
+                    onClick={() => navigate(`/patient/${patient.id}`)}
+                  />
                 ))}
               </CardContent>
             </Card>
@@ -206,6 +262,9 @@ const DoctorDashboard = () => {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* AI Insights */}
+            <AIInsights insights={aiInsights} />
+            
             {/* Vitals Chart */}
             <VitalsChart />
 
@@ -232,6 +291,14 @@ const DoctorDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Emergency Alert Modal */}
+      <EmergencyAlert
+        open={!!emergencyAlert}
+        onClose={() => setEmergencyAlert(null)}
+        patient={emergencyAlert?.patient || ""}
+        message={emergencyAlert?.message || ""}
+      />
     </div>
   );
 };

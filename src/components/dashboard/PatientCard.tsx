@@ -18,9 +18,10 @@ interface PatientCardProps {
       oxygen: number;
     };
   };
+  onClick?: () => void;
 }
 
-const PatientCard = ({ patient }: PatientCardProps) => {
+const PatientCard = ({ patient, onClick }: PatientCardProps) => {
   const statusColors = {
     normal: "success",
     warning: "default",
@@ -79,7 +80,7 @@ const PatientCard = ({ patient }: PatientCardProps) => {
         <p className="text-xs text-muted-foreground">
           Last reading: {patient.lastReading}
         </p>
-        <Button size="sm" variant="outline">
+        <Button size="sm" variant="outline" onClick={onClick}>
           View Details
         </Button>
       </div>
