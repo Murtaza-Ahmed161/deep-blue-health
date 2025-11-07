@@ -1,82 +1,172 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Brain, Mail, Lock, User, Phone } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ArrowLeft, UserCircle, Lock, Stethoscope, Heart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
+  const { user, role, loading } = useAuth();
+  const [isLogin, setIsLogin] = useState(true);
+  const [userType, setUserType] = useState<"doctor" | "patient">("patient");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [specialty, setSpecialty] = useState("");
+  const [licenseNumber, setLicenseNumber] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (!loading && user && role) {
+      if (role === 'doctor') {
+        navigate('/dashboard');
+      } else if (role === 'patient') {
+        navigate('/patient-dashboard');
+      }
+    }
+  }, [user, role, loading, navigate]);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    
-    // Simulate login
-    setTimeout(() => {
-      toast({
-        title: "Login Successful",
-        description: "Welcome back, Dr. Smith",
+    setIsSubmitting(true);
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
-      navigate('/dashboard');
-      setIsLoading(false);
-    }, 1000);
+
+      if (error) throw error;
+
+      toast({
+        title: "Login successful",
+        description: "Welcome back to NeuralTrace!",
+      });
+
+      // Navigation handled by useEffect based on role
+    } catch (error: any) {
+      console.error('Login error:', error);
+      toast({
+        title: "Login failed",
+        description: error.message || "Please check your credentials.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    
-    // Simulate signup
-    setTimeout(() => {
-      toast({
-        title: "Account Created",
-        description: "Please verify your email to continue",
+    setIsSubmitting(true);
+
+    try {
+      // Validate required fields
+      if (!email || !password || !fullName) {
+        throw new Error("Please fill in all required fields");
+      }
+
+      if (userType === 'doctor' && (!specialty || !licenseNumber)) {
+        throw new Error("Doctors must provide specialty and license number");
+      }
+
+      const metadata: any = {
+        full_name: fullName,
+        phone,
+        role: userType,
+      };
+
+      if (userType === 'doctor') {
+        metadata.specialty = specialty;
+        metadata.license_number = licenseNumber;
+      }
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: metadata,
+          emailRedirectTo: `${window.location.origin}/`,
+        },
       });
-      setIsLoading(false);
-    }, 1000);
+
+      if (error) throw error;
+
+      toast({
+        title: "Account created successfully",
+        description: `Welcome to NeuralTrace! You can now log in as a ${userType}.`,
+      });
+
+      // Switch to login tab
+      setIsLogin(true);
+      setEmail("");
+      setPassword("");
+      setFullName("");
+      setPhone("");
+      setSpecialty("");
+      setLicenseNumber("");
+    } catch (error: any) {
+      console.error('Signup error:', error);
+      toast({
+        title: "Signup failed",
+        description: error.message || "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-muted flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Logo */}
-        <div className="flex items-center justify-center gap-2 mb-8">
-          <Brain className="h-10 w-10 text-primary" />
-          <span className="text-3xl font-bold text-primary">NeuralTrace</span>
-        </div>
+        <Button
+          variant="ghost"
+          onClick={() => navigate("/")}
+          className="mb-6"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Home
+        </Button>
 
-        <Tabs defaultValue="login" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-4">
-            <TabsTrigger value="login">Login</TabsTrigger>
-            <TabsTrigger value="signup">Sign Up</TabsTrigger>
-          </TabsList>
+        <Card>
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">NeuralTrace</CardTitle>
+            <CardDescription>
+              {isLogin ? "Sign in to access your dashboard" : "Create your account"}
+            </CardDescription>
+          </CardHeader>
 
-          {/* Login Tab */}
-          <TabsContent value="login">
-            <Card>
-              <CardHeader>
-                <CardTitle>Doctor Login</CardTitle>
-                <CardDescription>
-                  Access your NeuralTrace dashboard
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleLogin} className="space-y-4">
+          <Tabs value={isLogin ? "login" : "signup"} onValueChange={(v) => setIsLogin(v === "login")}>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="login">Login</TabsTrigger>
+              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="login">
+              <form onSubmit={handleLogin}>
+                <CardContent className="space-y-4 pt-4">
                   <div className="space-y-2">
                     <Label htmlFor="login-email">Email</Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <UserCircle className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
                         id="login-email"
                         type="email"
-                        placeholder="doctor@hospital.com"
+                        placeholder="your-email@example.com"
                         className="pl-10"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         required
                       />
                     </div>
@@ -90,138 +180,142 @@ const Auth = () => {
                         type="password"
                         placeholder="••••••••"
                         className="pl-10"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                         required
                       />
                     </div>
                   </div>
-                  <Button 
-                    type="submit" 
-                    className="w-full" 
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Logging in..." : "Login"}
+                  <Button type="submit" className="w-full" disabled={isSubmitting}>
+                    {isSubmitting ? "Signing in..." : "Sign In"}
                   </Button>
-                  <Button 
-                    type="button" 
-                    variant="link" 
-                    className="w-full text-sm"
-                  >
-                    Forgot password?
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                </CardContent>
+              </form>
+            </TabsContent>
 
-          {/* Signup Tab */}
-          <TabsContent value="signup">
-            <Card>
-              <CardHeader>
-                <CardTitle>Create Doctor Account</CardTitle>
-                <CardDescription>
-                  Join the NeuralTrace healthcare network
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSignup} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="first-name">First Name</Label>
-                      <div className="relative">
-                        <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="first-name"
-                          placeholder="John"
-                          className="pl-10"
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="last-name">Last Name</Label>
-                      <div className="relative">
-                        <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="last-name"
-                          placeholder="Smith"
-                          className="pl-10"
-                          required
-                        />
-                      </div>
+            <TabsContent value="signup">
+              <form onSubmit={handleSignup}>
+                <CardContent className="space-y-4 pt-4">
+                  {/* User Type Selection */}
+                  <div className="space-y-2">
+                    <Label>I am a</Label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Button
+                        type="button"
+                        variant={userType === "patient" ? "default" : "outline"}
+                        className="h-20 flex flex-col items-center justify-center gap-2"
+                        onClick={() => setUserType("patient")}
+                      >
+                        <Heart className="h-6 w-6" />
+                        <span>Patient</span>
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={userType === "doctor" ? "default" : "outline"}
+                        className="h-20 flex flex-col items-center justify-center gap-2"
+                        onClick={() => setUserType("doctor")}
+                      >
+                        <Stethoscope className="h-6 w-6" />
+                        <span>Doctor</span>
+                      </Button>
                     </div>
                   </div>
+
+                  {/* Common Fields */}
                   <div className="space-y-2">
-                    <Label htmlFor="signup-email">Email</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="signup-email"
-                        type="email"
-                        placeholder="doctor@hospital.com"
-                        className="pl-10"
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone</Label>
-                    <div className="relative">
-                      <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="phone"
-                        type="tel"
-                        placeholder="+1 (555) 123-4567"
-                        className="pl-10"
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="license">Medical License Number</Label>
+                    <Label htmlFor="signup-name">Full Name *</Label>
                     <Input
-                      id="license"
-                      placeholder="e.g., MD123456"
+                      id="signup-name"
+                      type="text"
+                      placeholder="Dr. John Smith"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
                       required
                     />
                   </div>
+
                   <div className="space-y-2">
-                    <Label htmlFor="signup-password">Password</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="signup-password"
-                        type="password"
-                        placeholder="••••••••"
-                        className="pl-10"
-                        required
-                      />
-                    </div>
+                    <Label htmlFor="signup-email">Email *</Label>
+                    <Input
+                      id="signup-email"
+                      type="email"
+                      placeholder="your-email@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
                   </div>
-                  <Button 
-                    type="submit" 
-                    className="w-full" 
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Creating Account..." : "Create Account"}
+
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-phone">Phone</Label>
+                    <Input
+                      id="signup-phone"
+                      type="tel"
+                      placeholder="+1 (555) 123-4567"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                    />
+                  </div>
+
+                  {/* Doctor-specific Fields */}
+                  {userType === "doctor" && (
+                    <>
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-specialty">Specialty *</Label>
+                        <Select value={specialty} onValueChange={setSpecialty} required>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select specialty" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="cardiology">Cardiology</SelectItem>
+                            <SelectItem value="internal_medicine">Internal Medicine</SelectItem>
+                            <SelectItem value="emergency_medicine">Emergency Medicine</SelectItem>
+                            <SelectItem value="family_medicine">Family Medicine</SelectItem>
+                            <SelectItem value="neurology">Neurology</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-license">Medical License Number *</Label>
+                        <Input
+                          id="signup-license"
+                          type="text"
+                          placeholder="MD-123456"
+                          value={licenseNumber}
+                          onChange={(e) => setLicenseNumber(e.target.value)}
+                          required={userType === "doctor"}
+                        />
+                      </div>
+                    </>
+                  )}
+
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-password">Password *</Label>
+                    <Input
+                      id="signup-password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      minLength={6}
+                    />
+                  </div>
+
+                  <Button type="submit" className="w-full" disabled={isSubmitting}>
+                    {isSubmitting ? "Creating account..." : "Create Account"}
                   </Button>
+
                   <p className="text-xs text-muted-foreground text-center">
                     By signing up, you agree to our Terms of Service and Privacy Policy
                   </p>
-                </form>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-
-        <div className="mt-4 text-center">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate('/')}
-            className="text-muted-foreground"
-          >
-            ← Back to Home
-          </Button>
-        </div>
+                </CardContent>
+              </form>
+            </TabsContent>
+          </Tabs>
+        </Card>
       </div>
     </div>
   );
