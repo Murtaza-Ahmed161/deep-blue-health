@@ -83,6 +83,45 @@ export type Database = {
         }
         Relationships: []
       }
+      vitals: {
+        Row: {
+          blood_pressure_diastolic: number | null
+          blood_pressure_systolic: number | null
+          created_at: string
+          device_type: string | null
+          heart_rate: number | null
+          id: string
+          oxygen_saturation: number | null
+          synced_at: string
+          temperature: number | null
+          user_id: string
+        }
+        Insert: {
+          blood_pressure_diastolic?: number | null
+          blood_pressure_systolic?: number | null
+          created_at?: string
+          device_type?: string | null
+          heart_rate?: number | null
+          id?: string
+          oxygen_saturation?: number | null
+          synced_at?: string
+          temperature?: number | null
+          user_id: string
+        }
+        Update: {
+          blood_pressure_diastolic?: number | null
+          blood_pressure_systolic?: number | null
+          created_at?: string
+          device_type?: string | null
+          heart_rate?: number | null
+          id?: string
+          oxygen_saturation?: number | null
+          synced_at?: string
+          temperature?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
