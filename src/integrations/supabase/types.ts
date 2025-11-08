@@ -14,6 +14,143 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_screening_results: {
+        Row: {
+          anomaly_detected: boolean
+          confidence_level: number
+          created_at: string
+          explanation: string
+          id: string
+          recommendations: string[] | null
+          severity: string
+          user_id: string
+          vitals_id: string | null
+        }
+        Insert: {
+          anomaly_detected?: boolean
+          confidence_level: number
+          created_at?: string
+          explanation: string
+          id?: string
+          recommendations?: string[] | null
+          severity: string
+          user_id: string
+          vitals_id?: string | null
+        }
+        Update: {
+          anomaly_detected?: boolean
+          confidence_level?: number
+          created_at?: string
+          explanation?: string
+          id?: string
+          recommendations?: string[] | null
+          severity?: string
+          user_id?: string
+          vitals_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_screening_results_vitals_id_fkey"
+            columns: ["vitals_id"]
+            isOneToOne: false
+            referencedRelation: "vitals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      consultations: {
+        Row: {
+          consultation_type: string
+          created_at: string
+          doctor_id: string | null
+          doctor_notes: string | null
+          id: string
+          notes: string | null
+          patient_id: string
+          patient_notes: string | null
+          scheduled_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          consultation_type: string
+          created_at?: string
+          doctor_id?: string | null
+          doctor_notes?: string | null
+          id?: string
+          notes?: string | null
+          patient_id: string
+          patient_notes?: string | null
+          scheduled_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          consultation_type?: string
+          created_at?: string
+          doctor_id?: string | null
+          doctor_notes?: string | null
+          id?: string
+          notes?: string | null
+          patient_id?: string
+          patient_notes?: string | null
+          scheduled_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      medical_reports: {
+        Row: {
+          ai_summary: string | null
+          ai_tags: string[] | null
+          created_at: string
+          doctor_notes: string | null
+          file_name: string
+          file_type: string
+          file_url: string
+          id: string
+          ocr_text: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          upload_date: string
+          user_id: string
+        }
+        Insert: {
+          ai_summary?: string | null
+          ai_tags?: string[] | null
+          created_at?: string
+          doctor_notes?: string | null
+          file_name: string
+          file_type: string
+          file_url: string
+          id?: string
+          ocr_text?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          upload_date?: string
+          user_id: string
+        }
+        Update: {
+          ai_summary?: string | null
+          ai_tags?: string[] | null
+          created_at?: string
+          doctor_notes?: string | null
+          file_name?: string
+          file_type?: string
+          file_url?: string
+          id?: string
+          ocr_text?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          upload_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           address: string | null

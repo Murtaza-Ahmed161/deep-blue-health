@@ -1,1 +1,7 @@
 project_id = "lbjqpuyqokumkkwnujho"
+
+[functions.ai-screen-vitals]
+verify_jwt = true
+
+[functions.process-report]
+verify_jwt = true

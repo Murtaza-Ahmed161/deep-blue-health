@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Heart, Activity, Thermometer, Droplet, LogOut, Settings, User } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import AIInsights from "@/components/dashboard/AIInsights";
+import ReportUpload from "@/components/patient/ReportUpload";
+import ConsultationRequest from "@/components/patient/ConsultationRequest";
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
@@ -59,100 +61,97 @@ const PatientDashboard = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Current Vitals */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Current Vitals</CardTitle>
-                <CardDescription>Live from your connected devices</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="flex flex-col items-center p-4 rounded-lg bg-muted">
-                    <Heart className="h-8 w-8 text-destructive mb-2" />
-                    <p className="text-2xl font-bold">{currentVitals.heartRate}</p>
-                    <p className="text-xs text-muted-foreground">bpm</p>
-                  </div>
-                  <div className="flex flex-col items-center p-4 rounded-lg bg-muted">
-                    <Activity className="h-8 w-8 text-primary mb-2" />
-                    <p className="text-2xl font-bold">{currentVitals.bloodPressure}</p>
-                    <p className="text-xs text-muted-foreground">mmHg</p>
-                  </div>
-                  <div className="flex flex-col items-center p-4 rounded-lg bg-muted">
-                    <Thermometer className="h-8 w-8 text-warning mb-2" />
-                    <p className="text-2xl font-bold">{currentVitals.temperature}</p>
-                    <p className="text-xs text-muted-foreground">°F</p>
-                  </div>
-                  <div className="flex flex-col items-center p-4 rounded-lg bg-muted">
-                    <Droplet className="h-8 w-8 text-secondary mb-2" />
-                    <p className="text-2xl font-bold">{currentVitals.oxygen}</p>
-                    <p className="text-xs text-muted-foreground">%</p>
-                  </div>
+        <div className="grid gap-6">
+          {/* Current Vitals */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Current Vitals</CardTitle>
+              <CardDescription>Live from your connected devices</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="flex flex-col items-center p-4 rounded-lg bg-muted">
+                  <Heart className="h-8 w-8 text-destructive mb-2" />
+                  <p className="text-2xl font-bold">{currentVitals.heartRate}</p>
+                  <p className="text-xs text-muted-foreground">bpm</p>
                 </div>
-              </CardContent>
-            </Card>
+                <div className="flex flex-col items-center p-4 rounded-lg bg-muted">
+                  <Activity className="h-8 w-8 text-primary mb-2" />
+                  <p className="text-2xl font-bold">{currentVitals.bloodPressure}</p>
+                  <p className="text-xs text-muted-foreground">mmHg</p>
+                </div>
+                <div className="flex flex-col items-center p-4 rounded-lg bg-muted">
+                  <Thermometer className="h-8 w-8 text-warning mb-2" />
+                  <p className="text-2xl font-bold">{currentVitals.temperature}</p>
+                  <p className="text-xs text-muted-foreground">°F</p>
+                </div>
+                <div className="flex flex-col items-center p-4 rounded-lg bg-muted">
+                  <Droplet className="h-8 w-8 text-secondary mb-2" />
+                  <p className="text-2xl font-bold">{currentVitals.oxygen}</p>
+                  <p className="text-xs text-muted-foreground">%</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-            {/* Connection Status */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Connected Devices</CardTitle>
-                <CardDescription>Smartwatch and wearable status</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 rounded-lg border border-border">
-                    <div className="flex items-center gap-3">
-                      <div className="h-2 w-2 rounded-full bg-muted-foreground"></div>
-                      <div>
-                        <p className="font-medium text-sm">No devices connected</p>
-                        <p className="text-xs text-muted-foreground">Connect your smartwatch to start monitoring</p>
-                      </div>
+          {/* Connection Status */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Connected Devices</CardTitle>
+              <CardDescription>Smartwatch and wearable status</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 rounded-lg border border-border">
+                  <div className="flex items-center gap-3">
+                    <div className="h-2 w-2 rounded-full bg-muted-foreground"></div>
+                    <div>
+                      <p className="font-medium text-sm">No devices connected</p>
+                      <p className="text-xs text-muted-foreground">Connect your smartwatch to start monitoring</p>
                     </div>
-                    <Button size="sm" variant="outline">
-                      Connect Device
-                    </Button>
                   </div>
+                  <Button size="sm" variant="outline">
+                    Connect Device
+                  </Button>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* AI Insights */}
+          <AIInsights insights={aiInsights} />
+
+          {/* Report Upload and Consultation */}
+          <div className="grid lg:grid-cols-2 gap-6">
+            <ReportUpload />
+            <ConsultationRequest />
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* AI Health Insights */}
-            <AIInsights insights={aiInsights} />
-
-            {/* Profile Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <User className="h-5 w-5" />
-                  Profile
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
+          {/* Profile Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <User className="h-5 w-5" />
+                Profile
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div>
+                <p className="text-sm text-muted-foreground">Email</p>
+                <p className="font-medium">{profile?.email}</p>
+              </div>
+              {profile?.phone && (
                 <div>
-                  <p className="text-sm text-muted-foreground">Email</p>
-                  <p className="font-medium">{profile?.email}</p>
+                  <p className="text-sm text-muted-foreground">Phone</p>
+                  <p className="font-medium">{profile.phone}</p>
                 </div>
-                {profile?.phone && (
-                  <div>
-                    <p className="text-sm text-muted-foreground">Phone</p>
-                    <p className="font-medium">{profile.phone}</p>
-                  </div>
-                )}
-                <div>
-                  <p className="text-sm text-muted-foreground">Monitoring Mode</p>
-                  <Badge variant="secondary">AI Assistant Only</Badge>
-                </div>
-                <Button variant="outline" className="w-full" size="sm">
-                  Connect with Doctor
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
+              )}
+              <div>
+                <p className="text-sm text-muted-foreground">Monitoring Mode</p>
+                <Badge variant="secondary">AI Assistant Only</Badge>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
