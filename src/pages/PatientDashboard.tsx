@@ -5,6 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Heart, Activity, Thermometer, Droplet, LogOut, Settings, User } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import AIInsights from "@/components/dashboard/AIInsights";
 import ReportUpload from "@/components/patient/ReportUpload";
 import ConsultationRequest from "@/components/patient/ConsultationRequest";
@@ -12,6 +20,10 @@ import ConsultationRequest from "@/components/patient/ConsultationRequest";
 const PatientDashboard = () => {
   const navigate = useNavigate();
   const { user, profile, signOut } = useAuth();
+  const { toast } = useToast();
+  const [deviceConnected, setDeviceConnected] = useState(false);
+  const [lastSync, setLastSync] = useState<Date | null>(null);
+  const [showConnectDialog, setShowConnectDialog] = useState(false);
 
   // Mock data - will be replaced with real data from smartwatch integration
   const currentVitals = {
@@ -34,6 +46,29 @@ const PatientDashboard = () => {
   const handleLogout = async () => {
     await signOut();
     navigate("/");
+  };
+
+  const handleConnectDevice = () => {
+    if (deviceConnected) {
+      setDeviceConnected(false);
+      setLastSync(null);
+      toast({
+        title: "Device Disconnected",
+        description: "Your smartwatch has been disconnected.",
+      });
+    } else {
+      setShowConnectDialog(true);
+    }
+  };
+
+  const confirmConnection = () => {
+    setDeviceConnected(true);
+    setLastSync(new Date());
+    setShowConnectDialog(false);
+    toast({
+      title: "Device Connected Successfully",
+      description: "Google Fit mock data stream started. Vitals will update automatically.",
+    });
   };
 
   return (
@@ -104,14 +139,25 @@ const PatientDashboard = () => {
               <div className="space-y-3">
                 <div className="flex items-center justify-between p-3 rounded-lg border border-border">
                   <div className="flex items-center gap-3">
-                    <div className="h-2 w-2 rounded-full bg-muted-foreground"></div>
+                    <div className={`h-2 w-2 rounded-full ${deviceConnected ? 'bg-success' : 'bg-muted-foreground'}`}></div>
                     <div>
-                      <p className="font-medium text-sm">No devices connected</p>
-                      <p className="text-xs text-muted-foreground">Connect your smartwatch to start monitoring</p>
+                      <p className="font-medium text-sm">
+                        {deviceConnected ? 'Google Fit Connected' : 'No devices connected'}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {deviceConnected && lastSync 
+                          ? `Last synced: ${lastSync.toLocaleTimeString()}`
+                          : 'Connect your smartwatch to start monitoring'
+                        }
+                      </p>
                     </div>
                   </div>
-                  <Button size="sm" variant="outline">
-                    Connect Device
+                  <Button 
+                    size="sm" 
+                    variant={deviceConnected ? "destructive" : "outline"}
+                    onClick={handleConnectDevice}
+                  >
+                    {deviceConnected ? 'Disconnect' : 'Connect Device'}
                   </Button>
                 </div>
               </div>
@@ -154,6 +200,32 @@ const PatientDashboard = () => {
           </Card>
         </div>
       </div>
+
+      {/* Connect Device Dialog */}
+      <Dialog open={showConnectDialog} onOpenChange={setShowConnectDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Connect Smart Device</DialogTitle>
+            <DialogDescription>
+              Connect your smartwatch to enable continuous health monitoring.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <p className="text-sm text-muted-foreground">
+              This will simulate a connection to Google Fit for demonstration purposes. 
+              In production, you'll authenticate with your actual device.
+            </p>
+            <div className="flex gap-2">
+              <Button onClick={confirmConnection} className="flex-1">
+                Connect Google Fit
+              </Button>
+              <Button variant="outline" onClick={() => setShowConnectDialog(false)} className="flex-1">
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

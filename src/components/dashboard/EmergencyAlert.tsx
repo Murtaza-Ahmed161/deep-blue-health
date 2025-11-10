@@ -8,6 +8,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { AlertCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface EmergencyAlertProps {
   open: boolean;
@@ -17,6 +18,17 @@ interface EmergencyAlertProps {
 }
 
 const EmergencyAlert = ({ open, onClose, patient, message }: EmergencyAlertProps) => {
+  const { toast } = useToast();
+
+  const handleAcknowledge = () => {
+    toast({
+      title: "Alert Acknowledged",
+      description: `Critical alert for ${patient} has been acknowledged.`,
+      variant: "default",
+    });
+    onClose();
+  };
+
   return (
     <AlertDialog open={open} onOpenChange={onClose}>
       <AlertDialogContent className="border-destructive border-2">
@@ -39,7 +51,7 @@ const EmergencyAlert = ({ open, onClose, patient, message }: EmergencyAlertProps
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogAction onClick={onClose} className="bg-destructive hover:bg-destructive/90">
+          <AlertDialogAction onClick={handleAcknowledge} className="bg-destructive hover:bg-destructive/90">
             Acknowledged
           </AlertDialogAction>
         </AlertDialogFooter>

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Brain, Activity, Bell, LogOut, Users, TrendingUp, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 import PatientCard from "@/components/dashboard/PatientCard";
 import VitalsChart from "@/components/dashboard/VitalsChart";
 import AIInsights from "@/components/dashboard/AIInsights";
@@ -12,7 +13,9 @@ import { useVitalsStream } from "@/hooks/useVitalsStream";
 
 const DoctorDashboard = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [emergencyAlert, setEmergencyAlert] = useState<{ patient: string; message: string } | null>(null);
+  const [acknowledgedAlerts, setAcknowledgedAlerts] = useState<Set<string>>(new Set());
 
   const patients = [
     {
@@ -95,14 +98,14 @@ const DoctorDashboard = () => {
 
   // Trigger emergency alert for critical conditions
   useEffect(() => {
-    const criticalAlerts = streamAlerts.filter(a => a.severity === 'critical');
+    const criticalAlerts = streamAlerts.filter(a => a.severity === 'critical' && !acknowledgedAlerts.has(a.id));
     if (criticalAlerts.length > 0 && !emergencyAlert) {
       setEmergencyAlert({
         patient: criticalAlerts[0].patient,
         message: criticalAlerts[0].message,
       });
     }
-  }, [streamAlerts]);
+  }, [streamAlerts, acknowledgedAlerts, emergencyAlert]);
 
   // Update patient vitals with real-time data
   const updatedPatients = patients.map(patient => {
@@ -230,12 +233,27 @@ const DoctorDashboard = () => {
                         <Badge variant={alert.severity === 'critical' ? 'destructive' : 'default'}>
                           {alert.severity}
                         </Badge>
+                        {acknowledgedAlerts.has(alert.id) && (
+                          <Badge variant="success" className="text-xs">
+                            Acknowledged
+                          </Badge>
+                        )}
                       </div>
                       <p className="text-sm text-muted-foreground">{alert.message}</p>
                       <p className="text-xs text-muted-foreground mt-1">{alert.time}</p>
                     </div>
-                    <Button variant="outline" size="sm">
-                      Review
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        setAcknowledgedAlerts(prev => new Set(prev).add(alert.id));
+                        toast({
+                          title: "Alert Reviewed",
+                          description: `${alert.patient}'s alert has been marked as reviewed.`,
+                        });
+                      }}
+                    >
+                      Mark Reviewed
                     </Button>
                   </div>
                 ))}
@@ -274,15 +292,27 @@ const DoctorDashboard = () => {
                 <CardTitle>Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Button className="w-full justify-start" variant="outline">
+                <Button 
+                  className="w-full justify-start" 
+                  variant="outline"
+                  onClick={() => toast({ title: "Feature Coming Soon", description: "Add new patient functionality will be available soon." })}
+                >
                   <Users className="mr-2 h-4 w-4" />
                   Add New Patient
                 </Button>
-                <Button className="w-full justify-start" variant="outline">
+                <Button 
+                  className="w-full justify-start" 
+                  variant="outline"
+                  onClick={() => toast({ title: "Feature Coming Soon", description: "View all reports functionality will be available soon." })}
+                >
                   <Activity className="mr-2 h-4 w-4" />
                   View All Reports
                 </Button>
-                <Button className="w-full justify-start" variant="outline">
+                <Button 
+                  className="w-full justify-start" 
+                  variant="outline"
+                  onClick={() => toast({ title: "Feature Coming Soon", description: "Configure alerts functionality will be available soon." })}
+                >
                   <Bell className="mr-2 h-4 w-4" />
                   Configure Alerts
                 </Button>
@@ -295,7 +325,13 @@ const DoctorDashboard = () => {
       {/* Emergency Alert Modal */}
       <EmergencyAlert
         open={!!emergencyAlert}
-        onClose={() => setEmergencyAlert(null)}
+        onClose={() => {
+          const criticalAlert = streamAlerts.find(a => a.severity === 'critical' && a.patient === emergencyAlert?.patient);
+          if (criticalAlert) {
+            setAcknowledgedAlerts(prev => new Set(prev).add(criticalAlert.id));
+          }
+          setEmergencyAlert(null);
+        }}
         patient={emergencyAlert?.patient || ""}
         message={emergencyAlert?.message || ""}
       />
