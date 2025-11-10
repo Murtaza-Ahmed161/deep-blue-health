@@ -102,7 +102,7 @@ const DoctorDashboard = () => {
         message: criticalAlerts[0].message,
       });
     }
-  }, [streamAlerts, emergencyAlert]);
+  }, [streamAlerts]);
 
   // Update patient vitals with real-time data
   const updatedPatients = patients.map(patient => {
