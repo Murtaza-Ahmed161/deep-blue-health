@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ import ReportUpload from "@/components/patient/ReportUpload";
 import ConsultationRequest from "@/components/patient/ConsultationRequest";
 import FeedbackButton from "@/components/feedback/FeedbackButton";
 import { useSessionTracking } from "@/hooks/useSessionTracking";
+import { SkeletonVitalsCard, SkeletonCard } from "@/components/ui/skeleton-card";
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
@@ -104,6 +105,7 @@ const PatientDashboard = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="grid gap-6">
           {/* Current Vitals */}
+          <Suspense fallback={<SkeletonVitalsCard />}>
           <Card>
             <CardHeader>
               <CardTitle>Current Vitals</CardTitle>
@@ -134,8 +136,10 @@ const PatientDashboard = () => {
               </div>
             </CardContent>
           </Card>
+          </Suspense>
 
           {/* Connection Status */}
+          <Suspense fallback={<SkeletonCard />}>
           <Card>
             <CardHeader>
               <CardTitle>Connected Devices</CardTitle>
@@ -169,6 +173,7 @@ const PatientDashboard = () => {
               </div>
             </CardContent>
           </Card>
+          </Suspense>
 
           {/* AI Insights */}
           <AIInsights insights={aiInsights} />

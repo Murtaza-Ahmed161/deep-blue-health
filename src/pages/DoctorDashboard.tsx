@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, Suspense } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +12,7 @@ import EmergencyAlert from "@/components/dashboard/EmergencyAlert";
 import { useVitalsStream } from "@/hooks/useVitalsStream";
 import FeedbackButton from "@/components/feedback/FeedbackButton";
 import { useSessionTracking } from "@/hooks/useSessionTracking";
+import { SkeletonCard, SkeletonChart } from "@/components/ui/skeleton-card";
 
 const DoctorDashboard = () => {
   const navigate = useNavigate();
@@ -70,36 +71,38 @@ const DoctorDashboard = () => {
   // Real-time vitals streaming
   const { vitalsData, alerts: streamAlerts } = useVitalsStream(patients);
 
-  // Generate AI insights based on vitals
-  const aiInsights = Array.from(vitalsData.values()).flatMap((patientVitals) => {
-    const patient = patients.find(p => p.id === patientVitals.patientId);
-    if (!patient) return [];
+  // Generate AI insights based on vitals - memoized to prevent recalculation
+  const aiInsights = useMemo(() => 
+    Array.from(vitalsData.values()).flatMap((patientVitals) => {
+      const patient = patients.find(p => p.id === patientVitals.patientId);
+      if (!patient) return [];
 
-    const latest = patientVitals.readings[patientVitals.readings.length - 1];
-    const insights = [];
+      const latest = patientVitals.readings[patientVitals.readings.length - 1];
+      const insights = [];
 
-    if (latest.heartRate > 100) {
-      insights.push({
-        id: `${patient.id}-hr-trend`,
-        type: 'trend' as const,
-        message: `${patient.name}: Heart rate elevated (${latest.heartRate} bpm) - possible stress episode`,
-        severity: latest.heartRate > 120 ? 'critical' as const : 'warning' as const,
-        timestamp: '2 min ago',
-      });
-    }
+      if (latest.heartRate > 100) {
+        insights.push({
+          id: `${patient.id}-hr-trend`,
+          type: 'trend' as const,
+          message: `${patient.name}: Heart rate elevated (${latest.heartRate} bpm) - possible stress episode`,
+          severity: latest.heartRate > 120 ? 'critical' as const : 'warning' as const,
+          timestamp: '2 min ago',
+        });
+      }
 
-    if (latest.bloodPressure.systolic > 140) {
-      insights.push({
-        id: `${patient.id}-bp-anomaly`,
-        type: 'anomaly' as const,
-        message: `${patient.name}: Blood pressure spike detected (${latest.bloodPressure.systolic}/${latest.bloodPressure.diastolic})`,
-        severity: latest.bloodPressure.systolic > 160 ? 'critical' as const : 'warning' as const,
-        timestamp: 'Just now',
-      });
-    }
+      if (latest.bloodPressure.systolic > 140) {
+        insights.push({
+          id: `${patient.id}-bp-anomaly`,
+          type: 'anomaly' as const,
+          message: `${patient.name}: Blood pressure spike detected (${latest.bloodPressure.systolic}/${latest.bloodPressure.diastolic})`,
+          severity: latest.bloodPressure.systolic > 160 ? 'critical' as const : 'warning' as const,
+          timestamp: 'Just now',
+        });
+      }
 
-    return insights;
-  }).slice(0, 5);
+      return insights;
+    }).slice(0, 5)
+  , [vitalsData, patients]);
 
   // Trigger emergency alert for critical conditions
   useEffect(() => {
@@ -112,24 +115,26 @@ const DoctorDashboard = () => {
     }
   }, [streamAlerts, acknowledgedAlerts, emergencyAlert]);
 
-  // Update patient vitals with real-time data
-  const updatedPatients = patients.map(patient => {
-    const vitals = vitalsData.get(patient.id);
-    if (!vitals) return patient;
+  // Update patient vitals with real-time data - memoized
+  const updatedPatients = useMemo(() =>
+    patients.map(patient => {
+      const vitals = vitalsData.get(patient.id);
+      if (!vitals) return patient;
 
-    const latest = vitals.readings[vitals.readings.length - 1];
-    return {
-      ...patient,
-      status: vitals.status,
-      lastReading: 'Just now',
-      vitals: {
-        heartRate: latest.heartRate,
-        bloodPressure: `${latest.bloodPressure.systolic}/${latest.bloodPressure.diastolic}`,
-        temperature: latest.temperature,
-        oxygen: latest.oxygen,
-      },
-    };
-  });
+      const latest = vitals.readings[vitals.readings.length - 1];
+      return {
+        ...patient,
+        status: vitals.status,
+        lastReading: 'Just now',
+        vitals: {
+          heartRate: latest.heartRate,
+          bloodPressure: `${latest.bloodPressure.systolic}/${latest.bloodPressure.diastolic}`,
+          temperature: latest.temperature,
+          oxygen: latest.oxygen,
+        },
+      };
+    })
+  , [vitalsData, patients]);
 
   return (
     <div className="min-h-screen bg-muted">
@@ -287,10 +292,14 @@ const DoctorDashboard = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* AI Insights */}
-            <AIInsights insights={aiInsights} />
+            <Suspense fallback={<SkeletonCard />}>
+              <AIInsights insights={aiInsights} />
+            </Suspense>
             
             {/* Vitals Chart */}
-            <VitalsChart />
+            <Suspense fallback={<SkeletonChart />}>
+              <VitalsChart />
+            </Suspense>
 
             {/* Quick Actions */}
             <Card>

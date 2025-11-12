@@ -63,55 +63,58 @@ export const useVitalsStream = (patients: any[]) => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const newVitalsData = new Map<number, PatientVitals>();
-      const newAlerts: typeof alerts = [];
+      setVitalsData(prev => {
+        const newVitalsData = new Map<number, PatientVitals>(prev);
+        const newAlerts: typeof alerts = [];
 
-      patients.forEach((patient) => {
-        const newReading = generateReading(patient.id, patient.vitals);
-        const status = determineStatus(newReading);
-        
-        const existing = vitalsData.get(patient.id);
-        const readings = existing ? [...existing.readings.slice(-23), newReading] : [newReading];
-        
-        newVitalsData.set(patient.id, {
-          patientId: patient.id,
-          readings,
-          status,
+        patients.forEach((patient) => {
+          const newReading = generateReading(patient.id, patient.vitals);
+          const status = determineStatus(newReading);
+          
+          const existing = prev.get(patient.id);
+          const readings = existing ? [...existing.readings.slice(-23), newReading] : [newReading];
+          
+          newVitalsData.set(patient.id, {
+            patientId: patient.id,
+            readings,
+            status,
+          });
+
+          // Generate alerts
+          if (status === 'critical') {
+            if (newReading.heartRate > 140 || newReading.heartRate < 40) {
+              newAlerts.push({
+                id: `${patient.id}-hr-${Date.now()}`,
+                patientId: patient.id,
+                patient: patient.name,
+                message: `${newReading.heartRate > 140 ? 'Elevated' : 'Low'} heart rate detected: ${newReading.heartRate} bpm`,
+                severity: 'critical',
+                time: 'Just now',
+              });
+            }
+            if (newReading.bloodPressure.systolic > 160) {
+              newAlerts.push({
+                id: `${patient.id}-bp-${Date.now()}`,
+                patientId: patient.id,
+                patient: patient.name,
+                message: `High blood pressure: ${newReading.bloodPressure.systolic}/${newReading.bloodPressure.diastolic}`,
+                severity: 'critical',
+                time: 'Just now',
+              });
+            }
+          }
         });
 
-        // Generate alerts
-        if (status === 'critical') {
-          if (newReading.heartRate > 140 || newReading.heartRate < 40) {
-            newAlerts.push({
-              id: `${patient.id}-hr-${Date.now()}`,
-              patientId: patient.id,
-              patient: patient.name,
-              message: `${newReading.heartRate > 140 ? 'Elevated' : 'Low'} heart rate detected: ${newReading.heartRate} bpm`,
-              severity: 'critical',
-              time: 'Just now',
-            });
-          }
-          if (newReading.bloodPressure.systolic > 160) {
-            newAlerts.push({
-              id: `${patient.id}-bp-${Date.now()}`,
-              patientId: patient.id,
-              patient: patient.name,
-              message: `High blood pressure: ${newReading.bloodPressure.systolic}/${newReading.bloodPressure.diastolic}`,
-              severity: 'critical',
-              time: 'Just now',
-            });
-          }
+        if (newAlerts.length > 0) {
+          setAlerts(prev => [...newAlerts, ...prev].slice(0, 10));
         }
-      });
 
-      setVitalsData(newVitalsData);
-      if (newAlerts.length > 0) {
-        setAlerts(prev => [...newAlerts, ...prev].slice(0, 10));
-      }
-    }, 3000); // Update every 3 seconds
+        return newVitalsData;
+      });
+    }, 800); // Optimized: Update every 800ms for <1s lag
 
     return () => clearInterval(interval);
-  }, [patients, vitalsData]);
+  }, [patients]);
 
   return { vitalsData, alerts };
 };

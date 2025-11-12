@@ -1,15 +1,17 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { useMemo } from "react";
 
 const VitalsChart = () => {
-  const data = [
+  // Memoize data to prevent unnecessary re-renders
+  const data = useMemo(() => [
     { time: "00:00", heartRate: 72, bp: 120 },
     { time: "04:00", heartRate: 68, bp: 118 },
     { time: "08:00", heartRate: 75, bp: 122 },
     { time: "12:00", heartRate: 82, bp: 128 },
     { time: "16:00", heartRate: 78, bp: 125 },
     { time: "20:00", heartRate: 74, bp: 121 },
-  ];
+  ], []);
 
   return (
     <Card>
@@ -36,6 +38,7 @@ const VitalsChart = () => {
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '0.5rem',
               }}
+              animationDuration={200}
             />
             <Line 
               type="monotone" 
@@ -43,6 +46,7 @@ const VitalsChart = () => {
               stroke="hsl(var(--destructive))" 
               strokeWidth={2}
               dot={{ fill: 'hsl(var(--destructive))' }}
+              isAnimationActive={false}
             />
             <Line 
               type="monotone" 
@@ -50,6 +54,7 @@ const VitalsChart = () => {
               stroke="hsl(var(--secondary))" 
               strokeWidth={2}
               dot={{ fill: 'hsl(var(--secondary))' }}
+              isAnimationActive={false}
             />
           </LineChart>
         </ResponsiveContainer>
