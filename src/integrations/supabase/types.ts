@@ -58,6 +58,39 @@ export type Database = {
           },
         ]
       }
+      beta_invite_codes: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          current_uses: number
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          max_uses: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          current_uses?: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          current_uses?: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number
+        }
+        Relationships: []
+      }
       consultations: {
         Row: {
           consultation_type: string
@@ -97,6 +130,54 @@ export type Database = {
           scheduled_at?: string | null
           status?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      feedback: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          description: string
+          device_info: Json | null
+          id: string
+          page_url: string | null
+          priority: string | null
+          screenshot_url: string | null
+          status: string
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          description: string
+          device_info?: Json | null
+          id?: string
+          page_url?: string | null
+          priority?: string | null
+          screenshot_url?: string | null
+          status?: string
+          title: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          description?: string
+          device_info?: Json | null
+          id?: string
+          page_url?: string | null
+          priority?: string | null
+          screenshot_url?: string | null
+          status?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -199,6 +280,30 @@ export type Database = {
         }
         Relationships: []
       }
+      system_metrics: {
+        Row: {
+          id: string
+          metadata: Json | null
+          metric_type: string
+          metric_value: number | null
+          recorded_at: string
+        }
+        Insert: {
+          id?: string
+          metadata?: Json | null
+          metric_type: string
+          metric_value?: number | null
+          recorded_at?: string
+        }
+        Update: {
+          id?: string
+          metadata?: Json | null
+          metric_type?: string
+          metric_value?: number | null
+          recorded_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -216,6 +321,45 @@ export type Database = {
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_sessions: {
+        Row: {
+          actions_performed: Json | null
+          browser: string | null
+          created_at: string
+          device_type: string | null
+          duration_seconds: number | null
+          id: string
+          page_views: number | null
+          session_end: string | null
+          session_start: string
+          user_id: string
+        }
+        Insert: {
+          actions_performed?: Json | null
+          browser?: string | null
+          created_at?: string
+          device_type?: string | null
+          duration_seconds?: number | null
+          id?: string
+          page_views?: number | null
+          session_end?: string | null
+          session_start?: string
+          user_id: string
+        }
+        Update: {
+          actions_performed?: Json | null
+          browser?: string | null
+          created_at?: string
+          device_type?: string | null
+          duration_seconds?: number | null
+          id?: string
+          page_views?: number | null
+          session_end?: string | null
+          session_start?: string
           user_id?: string
         }
         Relationships: []

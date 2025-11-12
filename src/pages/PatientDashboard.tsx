@@ -16,6 +16,8 @@ import {
 import AIInsights from "@/components/dashboard/AIInsights";
 import ReportUpload from "@/components/patient/ReportUpload";
 import ConsultationRequest from "@/components/patient/ConsultationRequest";
+import FeedbackButton from "@/components/feedback/FeedbackButton";
+import { useSessionTracking } from "@/hooks/useSessionTracking";
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
@@ -24,6 +26,9 @@ const PatientDashboard = () => {
   const [deviceConnected, setDeviceConnected] = useState(false);
   const [lastSync, setLastSync] = useState<Date | null>(null);
   const [showConnectDialog, setShowConnectDialog] = useState(false);
+
+  // Track user session
+  useSessionTracking();
 
   // Mock data - will be replaced with real data from smartwatch integration
   const currentVitals = {
@@ -82,6 +87,7 @@ const PatientDashboard = () => {
               <p className="text-muted-foreground">Your Health Dashboard</p>
             </div>
             <div className="flex items-center gap-2">
+              <FeedbackButton />
               <Button variant="outline" onClick={() => navigate('/settings')}>
                 <Settings className="mr-2 h-4 w-4" />
                 Settings

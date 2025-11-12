@@ -10,12 +10,17 @@ import VitalsChart from "@/components/dashboard/VitalsChart";
 import AIInsights from "@/components/dashboard/AIInsights";
 import EmergencyAlert from "@/components/dashboard/EmergencyAlert";
 import { useVitalsStream } from "@/hooks/useVitalsStream";
+import FeedbackButton from "@/components/feedback/FeedbackButton";
+import { useSessionTracking } from "@/hooks/useSessionTracking";
 
 const DoctorDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [emergencyAlert, setEmergencyAlert] = useState<{ patient: string; message: string } | null>(null);
   const [acknowledgedAlerts, setAcknowledgedAlerts] = useState<Set<string>>(new Set());
+  
+  // Track user session
+  useSessionTracking();
 
   const patients = [
     {
@@ -137,6 +142,7 @@ const DoctorDashboard = () => {
               <span className="text-2xl font-bold text-primary">NeuralTrace</span>
             </div>
             <div className="flex items-center gap-4">
+              <FeedbackButton />
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="h-5 w-5" />
                 <span className="absolute top-0 right-0 h-2 w-2 bg-destructive rounded-full" />
