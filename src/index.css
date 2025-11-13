@@ -112,6 +112,23 @@ All colors MUST be HSL.
     --sidebar-border: 217 33% 27%;
     --sidebar-ring: 199 92% 60%;
   }
+
+  /* Touch-friendly spacing */
+  .touch-target {
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  /* Touch gestures */
+  .touch-pan-x {
+    touch-action: pan-x;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .touch-pan-y {
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 @layer base {

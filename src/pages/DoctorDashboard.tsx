@@ -2,7 +2,9 @@ import { useState, useEffect, useMemo, Suspense } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Brain, Activity, Bell, LogOut, Users, TrendingUp, AlertCircle } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Brain, Activity, Bell, LogOut, Users, TrendingUp, AlertCircle, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import PatientCard from "@/components/dashboard/PatientCard";
@@ -138,15 +140,17 @@ const DoctorDashboard = () => {
 
   return (
     <div className="min-h-screen bg-muted">
-      {/* Top Navigation */}
-      <nav className="bg-card border-b border-border">
-        <div className="container mx-auto px-4 py-4">
+      {/* Top Navigation - Responsive */}
+      <nav className="sticky top-0 z-10 bg-card border-b border-border">
+        <div className="container mx-auto px-3 md:px-4 py-3 md:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Brain className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-bold text-primary">NeuralTrace</span>
+              <Brain className="h-6 md:h-8 w-6 md:w-8 text-primary" />
+              <span className="text-lg md:text-2xl font-bold text-primary">NeuralTrace</span>
             </div>
-            <div className="flex items-center gap-4">
+            
+            {/* Desktop Actions */}
+            <div className="hidden md:flex items-center gap-4">
               <FeedbackButton />
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="h-5 w-5" />
@@ -164,63 +168,92 @@ const DoctorDashboard = () => {
                 <LogOut className="h-5 w-5" />
               </Button>
             </div>
+
+            {/* Mobile Menu */}
+            <Sheet>
+              <SheetTrigger asChild className="md:hidden">
+                <Button variant="ghost" size="icon" className="relative">
+                  <Menu className="h-5 w-5" />
+                  <span className="absolute top-1 right-1 h-2 w-2 bg-destructive rounded-full" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent>
+                <div className="flex flex-col gap-4 mt-8">
+                  <div className="p-4 rounded-lg bg-muted">
+                    <p className="font-medium">Dr. John Smith</p>
+                    <p className="text-sm text-muted-foreground">Cardiology</p>
+                  </div>
+                  <FeedbackButton variant="outline" size="default" />
+                  <Button variant="outline" className="w-full justify-start relative">
+                    <Bell className="mr-2 h-4 w-4" />
+                    Notifications
+                    <span className="absolute top-2 right-2 h-2 w-2 bg-destructive rounded-full" />
+                  </Button>
+                  <Button variant="ghost" onClick={() => navigate('/')} className="w-full justify-start">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                  </Button>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </nav>
 
-      <div className="container mx-auto px-4 py-8">
-        {/* Stats Overview */}
-        <div className="grid md:grid-cols-4 gap-4 mb-8">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
+      <div className="container mx-auto px-3 md:px-4 py-4 md:py-8">
+        {/* Stats Overview - Responsive Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
+          <Card className="touch-target">
+            <CardContent className="pt-4 md:pt-6 px-3 md:px-6">
+              <div className="flex flex-col md:flex-row items-start md:items-center md:justify-between gap-2">
                 <div>
-                  <p className="text-sm text-muted-foreground">Total Patients</p>
-                  <p className="text-3xl font-bold text-foreground">24</p>
+                  <p className="text-xs md:text-sm text-muted-foreground">Total Patients</p>
+                  <p className="text-2xl md:text-3xl font-bold text-foreground">24</p>
                 </div>
-                <Users className="h-8 w-8 text-primary" />
+                <Users className="h-6 md:h-8 w-6 md:w-8 text-primary" />
               </div>
             </CardContent>
           </Card>
           
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
+          <Card className="touch-target">
+            <CardContent className="pt-4 md:pt-6 px-3 md:px-6">
+              <div className="flex flex-col md:flex-row items-start md:items-center md:justify-between gap-2">
                 <div>
-                  <p className="text-sm text-muted-foreground">Active Monitors</p>
-                  <p className="text-3xl font-bold text-foreground">18</p>
+                  <p className="text-xs md:text-sm text-muted-foreground">Active</p>
+                  <p className="text-2xl md:text-3xl font-bold text-foreground">18</p>
                 </div>
-                <Activity className="h-8 w-8 text-success" />
+                <Activity className="h-6 md:h-8 w-6 md:w-8 text-success" />
               </div>
             </CardContent>
           </Card>
           
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
+          <Card className="touch-target">
+            <CardContent className="pt-4 md:pt-6 px-3 md:px-6">
+              <div className="flex flex-col md:flex-row items-start md:items-center md:justify-between gap-2">
                 <div>
-                  <p className="text-sm text-muted-foreground">Alerts Today</p>
-                  <p className="text-3xl font-bold text-foreground">7</p>
+                  <p className="text-xs md:text-sm text-muted-foreground">Alerts</p>
+                  <p className="text-2xl md:text-3xl font-bold text-foreground">7</p>
                 </div>
-                <AlertCircle className="h-8 w-8 text-warning" />
+                <AlertCircle className="h-6 md:h-8 w-6 md:w-8 text-warning" />
               </div>
             </CardContent>
           </Card>
           
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
+          <Card className="touch-target">
+            <CardContent className="pt-4 md:pt-6 px-3 md:px-6">
+              <div className="flex flex-col md:flex-row items-start md:items-center md:justify-between gap-2">
                 <div>
-                  <p className="text-sm text-muted-foreground">Avg Response</p>
-                  <p className="text-3xl font-bold text-foreground">1.2m</p>
+                  <p className="text-xs md:text-sm text-muted-foreground">Response</p>
+                  <p className="text-2xl md:text-3xl font-bold text-foreground">1.2m</p>
                 </div>
-                <TrendingUp className="h-8 w-8 text-secondary" />
+                <TrendingUp className="h-6 md:h-8 w-6 md:w-8 text-secondary" />
               </div>
             </CardContent>
           </Card>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        {/* Desktop Layout */}
+        <div className="hidden lg:grid lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Active Alerts */}
@@ -291,17 +324,14 @@ const DoctorDashboard = () => {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* AI Insights */}
             <Suspense fallback={<SkeletonCard />}>
               <AIInsights insights={aiInsights} />
             </Suspense>
             
-            {/* Vitals Chart */}
             <Suspense fallback={<SkeletonChart />}>
               <VitalsChart />
             </Suspense>
 
-            {/* Quick Actions */}
             <Card>
               <CardHeader>
                 <CardTitle>Quick Actions</CardTitle>
@@ -335,6 +365,133 @@ const DoctorDashboard = () => {
             </Card>
           </div>
         </div>
+
+        {/* Mobile & Tablet Tabbed Layout */}
+        <Tabs defaultValue="patients" className="lg:hidden">
+          <TabsList className="grid w-full grid-cols-4 mb-4">
+            <TabsTrigger value="alerts" className="text-xs">Alerts</TabsTrigger>
+            <TabsTrigger value="patients" className="text-xs">Patients</TabsTrigger>
+            <TabsTrigger value="insights" className="text-xs">Insights</TabsTrigger>
+            <TabsTrigger value="actions" className="text-xs">Actions</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="alerts" className="space-y-3 mt-0">
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <AlertCircle className="h-5 w-5 text-destructive" />
+                  Active Alerts
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {streamAlerts.slice(0, 5).map((alert) => (
+                  <div 
+                    key={alert.id} 
+                    className="p-4 rounded-lg border border-border bg-background touch-target space-y-3"
+                  >
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        <p className="font-medium">{alert.patient}</p>
+                        <Badge variant={alert.severity === 'critical' ? 'destructive' : 'default'}>
+                          {alert.severity}
+                        </Badge>
+                        {acknowledgedAlerts.has(alert.id) && (
+                          <Badge variant="success" className="text-xs">
+                            Acknowledged
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground">{alert.message}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{alert.time}</p>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="default"
+                      className="w-full touch-target"
+                      onClick={() => {
+                        setAcknowledgedAlerts(prev => new Set(prev).add(alert.id));
+                        toast({
+                          title: "Alert Reviewed",
+                          description: `${alert.patient}'s alert has been marked as reviewed.`,
+                        });
+                      }}
+                    >
+                      Mark Reviewed
+                    </Button>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="patients" className="space-y-3 mt-0">
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg">Patient Overview</CardTitle>
+                <CardDescription className="text-xs">Real-time monitoring</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3 touch-pan-y overflow-y-auto max-h-[calc(100vh-300px)]">
+                {updatedPatients.map((patient) => (
+                  <div key={patient.id} className="touch-target">
+                    <PatientCard 
+                      patient={patient}
+                      onClick={() => navigate(`/patient/${patient.id}`)}
+                    />
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="insights" className="space-y-3 mt-0">
+            <Suspense fallback={<SkeletonCard />}>
+              <AIInsights insights={aiInsights} />
+            </Suspense>
+            
+            <Suspense fallback={<SkeletonChart />}>
+              <div className="touch-pan-x overflow-x-auto">
+                <VitalsChart />
+              </div>
+            </Suspense>
+          </TabsContent>
+
+          <TabsContent value="actions" className="space-y-3 mt-0">
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg">Quick Actions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button 
+                  className="w-full justify-start touch-target" 
+                  variant="outline"
+                  size="lg"
+                  onClick={() => toast({ title: "Feature Coming Soon", description: "Add new patient functionality will be available soon." })}
+                >
+                  <Users className="mr-2 h-5 w-5" />
+                  Add New Patient
+                </Button>
+                <Button 
+                  className="w-full justify-start touch-target" 
+                  variant="outline"
+                  size="lg"
+                  onClick={() => toast({ title: "Feature Coming Soon", description: "View all reports functionality will be available soon." })}
+                >
+                  <Activity className="mr-2 h-5 w-5" />
+                  View All Reports
+                </Button>
+                <Button 
+                  className="w-full justify-start touch-target" 
+                  variant="outline"
+                  size="lg"
+                  onClick={() => toast({ title: "Feature Coming Soon", description: "Configure alerts functionality will be available soon." })}
+                >
+                  <Bell className="mr-2 h-5 w-5" />
+                  Configure Alerts
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
 
       {/* Emergency Alert Modal */}
