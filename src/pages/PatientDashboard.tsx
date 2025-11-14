@@ -1,4 +1,4 @@
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,11 @@ import ConsultationRequest from "@/components/patient/ConsultationRequest";
 import FeedbackButton from "@/components/feedback/FeedbackButton";
 import { useSessionTracking } from "@/hooks/useSessionTracking";
 import { SkeletonVitalsCard, SkeletonCard } from "@/components/ui/skeleton-card";
+import OfflineIndicator from "@/components/OfflineIndicator";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import { useRetryLogic } from "@/hooks/useRetryLogic";
+import { useUptimeMonitoring } from "@/hooks/useUptimeMonitoring";
+import { useNotifications } from "@/hooks/useNotifications";
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
@@ -30,8 +35,33 @@ const PatientDashboard = () => {
   const [lastSync, setLastSync] = useState<Date | null>(null);
   const [showConnectDialog, setShowConnectDialog] = useState(false);
 
+  // Reliability features
+  const { isOnline } = useOnlineStatus();
+  const { processOfflineQueue } = useRetryLogic();
+  const { sendNotification } = useNotifications();
+  
   // Track user session
   useSessionTracking();
+  
+  // Monitor uptime
+  useUptimeMonitoring();
+
+  // Process offline queue when connection restored
+  useEffect(() => {
+    if (isOnline) {
+      processOfflineQueue();
+    }
+  }, [isOnline, processOfflineQueue]);
+
+  // Send notification for critical vitals
+  useEffect(() => {
+    if (currentVitals.heartRate > 100 || currentVitals.oxygen < 95) {
+      sendNotification('Health Alert', {
+        body: `Heart rate: ${currentVitals.heartRate} bpm, Oxygen: ${currentVitals.oxygen}%`,
+        tag: 'vitals-warning',
+      });
+    }
+  }, [currentVitals, sendNotification]);
 
   // Mock data - will be replaced with real data from smartwatch integration
   const currentVitals = {
@@ -80,6 +110,8 @@ const PatientDashboard = () => {
   };
 
   return (
+    <>
+      <OfflineIndicator />
     <div className="min-h-screen bg-muted">
       {/* Header - Responsive */}
       <div className="sticky top-0 z-10 bg-card border-b border-border">
@@ -373,6 +405,7 @@ const PatientDashboard = () => {
         </DialogContent>
       </Dialog>
     </div>
+    </>
   );
 };
 
