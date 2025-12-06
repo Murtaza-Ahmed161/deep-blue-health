@@ -53,6 +53,14 @@ const PatientDashboard = () => {
     }
   }, [isOnline, processOfflineQueue]);
 
+  // Mock data - will be replaced with real data from smartwatch integration
+  const currentVitals = {
+    heartRate: 72,
+    bloodPressure: "120/80",
+    temperature: 98.6,
+    oxygen: 98,
+  };
+
   // Send notification for critical vitals
   useEffect(() => {
     if (currentVitals.heartRate > 100 || currentVitals.oxygen < 95) {
@@ -61,15 +69,7 @@ const PatientDashboard = () => {
         tag: 'vitals-warning',
       });
     }
-  }, [currentVitals, sendNotification]);
-
-  // Mock data - will be replaced with real data from smartwatch integration
-  const currentVitals = {
-    heartRate: 72,
-    bloodPressure: "120/80",
-    temperature: 98.6,
-    oxygen: 98,
-  };
+  }, [sendNotification]);
 
   const aiInsights = [
     {
