@@ -108,7 +108,6 @@ export const useNotifications = () => {
       const notification = new Notification(title, {
         icon: '/favicon.ico',
         badge: '/favicon.ico',
-        vibrate: [200, 100, 200],
         ...options,
       });
 

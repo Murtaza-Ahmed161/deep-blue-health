@@ -232,6 +232,78 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          created_at: string
+          critical_alerts: boolean
+          doctor_messages: boolean
+          email_enabled: boolean
+          id: string
+          new_reports: boolean
+          push_enabled: boolean
+          updated_at: string
+          user_id: string
+          vitals_warnings: boolean
+        }
+        Insert: {
+          created_at?: string
+          critical_alerts?: boolean
+          doctor_messages?: boolean
+          email_enabled?: boolean
+          id?: string
+          new_reports?: boolean
+          push_enabled?: boolean
+          updated_at?: string
+          user_id: string
+          vitals_warnings?: boolean
+        }
+        Update: {
+          created_at?: string
+          critical_alerts?: boolean
+          doctor_messages?: boolean
+          email_enabled?: boolean
+          id?: string
+          new_reports?: boolean
+          push_enabled?: boolean
+          updated_at?: string
+          user_id?: string
+          vitals_warnings?: boolean
+        }
+        Relationships: []
+      }
+      offline_queue: {
+        Row: {
+          created_at: string
+          id: string
+          last_error: string | null
+          request_data: Json
+          request_type: string
+          retry_count: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_error?: string | null
+          request_data: Json
+          request_type: string
+          retry_count?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_error?: string | null
+          request_data?: Json
+          request_type?: string
+          retry_count?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           address: string | null

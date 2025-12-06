@@ -4,10 +4,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Save } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
+import { ArrowLeft, Save, User, Bell, Shield } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import NotificationSettings from "@/components/settings/NotificationSettings";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -72,24 +75,13 @@ const Settings = () => {
             </Button>
             <div>
               <h1 className="text-3xl font-bold">Settings</h1>
-              <p className="text-muted-foreground">Manage your profile and emergency contacts</p>
+              <p className="text-muted-foreground">Manage your profile and preferences</p>
             </div>
           </div>
         </div>
       </div>
 
       <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <Button
-          variant="ghost"
-          onClick={() => navigate(-1)}
-          className="mb-6"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
-        </Button>
-
-        <h1 className="text-3xl font-bold mb-6">Settings</h1>
-
         <Tabs defaultValue="profile" className="space-y-6">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="profile">
@@ -106,7 +98,7 @@ const Settings = () => {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="profile">
+          <TabsContent value="profile" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle>Profile Information</CardTitle>
@@ -116,10 +108,11 @@ const Settings = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
+                  <Label htmlFor="full_name">Full Name</Label>
                   <Input
-                    id="name"
-                    defaultValue={profile?.full_name || ""}
+                    id="full_name"
+                    value={formData.full_name}
+                    onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                     placeholder="Enter your full name"
                   />
                 </div>
@@ -142,16 +135,62 @@ const Settings = () => {
                   <Input
                     id="phone"
                     type="tel"
-                    defaultValue={profile?.phone || ""}
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="Enter your phone number"
                   />
                 </div>
 
-                <Separator />
-
-                <Button>Save Changes</Button>
+                <div className="space-y-2">
+                  <Label htmlFor="address">Address</Label>
+                  <Input
+                    id="address"
+                    value={formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    placeholder="Enter your address"
+                  />
+                </div>
               </CardContent>
             </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Emergency Contact</CardTitle>
+                <CardDescription>
+                  This person will be notified if your vitals reach critical levels
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="emergency_contact_name">Contact Name</Label>
+                  <Input
+                    id="emergency_contact_name"
+                    value={formData.emergency_contact_name}
+                    onChange={(e) =>
+                      setFormData({ ...formData, emergency_contact_name: e.target.value })
+                    }
+                    placeholder="Enter emergency contact name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="emergency_contact_phone">Contact Phone</Label>
+                  <Input
+                    id="emergency_contact_phone"
+                    type="tel"
+                    value={formData.emergency_contact_phone}
+                    onChange={(e) =>
+                      setFormData({ ...formData, emergency_contact_phone: e.target.value })
+                    }
+                    placeholder="Enter emergency contact phone"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Button onClick={handleSave} disabled={saving} className="w-full">
+              <Save className="mr-2 h-4 w-4" />
+              {saving ? "Saving..." : "Save Profile Changes"}
+            </Button>
           </TabsContent>
 
           <TabsContent value="notifications">
@@ -201,64 +240,6 @@ const Settings = () => {
             </Card>
           </TabsContent>
         </Tabs>
-      </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="address">Address</Label>
-                <Input
-                  id="address"
-                  value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Emergency Contact</CardTitle>
-              <CardDescription>
-                This person will be notified if your vitals reach critical levels
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="emergency_contact_name">Contact Name</Label>
-                <Input
-                  id="emergency_contact_name"
-                  value={formData.emergency_contact_name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, emergency_contact_name: e.target.value })
-                  }
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="emergency_contact_phone">Contact Phone</Label>
-                <Input
-                  id="emergency_contact_phone"
-                  type="tel"
-                  value={formData.emergency_contact_phone}
-                  onChange={(e) =>
-                    setFormData({ ...formData, emergency_contact_phone: e.target.value })
-                  }
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Button onClick={handleSave} disabled={saving} className="w-full">
-            <Save className="mr-2 h-4 w-4" />
-            {saving ? "Saving..." : "Save Changes"}
-          </Button>
-        </div>
       </div>
     </div>
   );

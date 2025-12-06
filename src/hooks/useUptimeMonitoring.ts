@@ -30,7 +30,7 @@ export const useUptimeMonitoring = () => {
           const responseTime = Date.now() - startTime;
           
           // Track successful health check
-          trackMetric('health_check_success', responseTime, {
+          trackMetric('connection_uptime', responseTime, {
             uptime_ms: uptime,
             consecutive_failures: consecutiveFailures,
           });
@@ -47,15 +47,16 @@ export const useUptimeMonitoring = () => {
         console.error('Health check failed:', error);
         
         // Track failure
-        trackMetric('health_check_failure', downtime, {
+        trackMetric('api_error', downtime, {
           error: error instanceof Error ? error.message : 'Unknown error',
           consecutive_failures: consecutiveFailures,
         });
 
         // Log critical error if down for > 5 minutes
         if (downtime > 300000) {
-          trackMetric('system_downtime_critical', downtime, {
+          trackMetric('api_error', downtime, {
             consecutive_failures: consecutiveFailures,
+            critical: true,
           });
         }
       }
