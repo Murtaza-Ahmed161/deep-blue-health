@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,9 +10,12 @@ import { ArrowLeft, UserCircle, Lock, Stethoscope, Heart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { ForgotPasswordDialog } from "@/components/auth/ForgotPasswordDialog";
+import { ResetPasswordForm } from "@/components/auth/ResetPasswordForm";
 
 const Auth = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const { user, role, loading } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
@@ -24,6 +27,18 @@ const Auth = () => {
   const [specialty, setSpecialty] = useState("");
   const [licenseNumber, setLicenseNumber] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showResetForm, setShowResetForm] = useState(false);
+
+  // Check for password reset flow
+  useEffect(() => {
+    const isReset = searchParams.get('reset') === 'true';
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const type = hashParams.get('type');
+    
+    if (isReset || type === 'recovery') {
+      setShowResetForm(true);
+    }
+  }, [searchParams]);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -127,6 +142,15 @@ const Auth = () => {
     }
   };
 
+  // Show reset password form if in recovery mode
+  if (showResetForm) {
+    return (
+      <div className="min-h-screen bg-muted flex items-center justify-center p-4">
+        <ResetPasswordForm />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-muted flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -172,7 +196,10 @@ const Auth = () => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="login-password">Password</Label>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="login-password">Password</Label>
+                      <ForgotPasswordDialog onOtpSent={(email) => setEmail(email)} />
+                    </div>
                     <div className="relative">
                       <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
