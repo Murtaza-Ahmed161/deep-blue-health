@@ -12,6 +12,7 @@ import RoleDistributionChart from "@/components/admin/RoleDistributionChart";
 import SystemHealthCard from "@/components/admin/SystemHealthCard";
 import RecentFeedbackList from "@/components/admin/RecentFeedbackList";
 import AlertsTimelineChart from "@/components/admin/AlertsTimelineChart";
+import { BetaInviteManager } from "@/components/admin/BetaInviteManager";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -302,6 +303,11 @@ const AdminDashboard = () => {
 
         {/* Recent Feedback */}
         <RecentFeedbackList feedback={recentFeedback} />
+
+        {/* Beta Invite Management */}
+        <div className="mt-8">
+          <BetaInviteManager />
+        </div>
       </div>
     </div>
   );

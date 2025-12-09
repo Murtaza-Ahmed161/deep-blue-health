@@ -6,12 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Save, User, Bell, Shield } from "lucide-react";
+import { ArrowLeft, Save, User, Bell, Shield, FileCheck } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import NotificationSettings from "@/components/settings/NotificationSettings";
 import TwoFactorSetup from "@/components/settings/TwoFactorSetup";
+import { ConsentAuditTrail } from "@/components/settings/ConsentAuditTrail";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -84,7 +85,7 @@ const Settings = () => {
 
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="profile">
               <User className="mr-2 h-4 w-4" />
               Profile
@@ -96,6 +97,10 @@ const Settings = () => {
             <TabsTrigger value="security">
               <Shield className="mr-2 h-4 w-4" />
               Security
+            </TabsTrigger>
+            <TabsTrigger value="consent">
+              <FileCheck className="mr-2 h-4 w-4" />
+              Consent
             </TabsTrigger>
           </TabsList>
 
@@ -241,6 +246,10 @@ const Settings = () => {
                 <Button>Update Password</Button>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="consent">
+            <ConsentAuditTrail />
           </TabsContent>
         </Tabs>
       </div>

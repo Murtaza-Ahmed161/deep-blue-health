@@ -91,6 +91,39 @@ export type Database = {
         }
         Relationships: []
       }
+      consent_audit: {
+        Row: {
+          consent_type: Database["public"]["Enums"]["consent_type"]
+          created_at: string
+          granted: boolean
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          consent_type: Database["public"]["Enums"]["consent_type"]
+          created_at?: string
+          granted: boolean
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          consent_type?: Database["public"]["Enums"]["consent_type"]
+          created_at?: string
+          granted?: boolean
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       consultations: {
         Row: {
           consultation_type: string
@@ -490,6 +523,14 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "doctor" | "patient" | "caregiver"
+      consent_type:
+        | "device_data"
+        | "doctor_access"
+        | "location"
+        | "notifications"
+        | "data_sharing"
+        | "terms_of_service"
+        | "privacy_policy"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -618,6 +659,15 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "doctor", "patient", "caregiver"],
+      consent_type: [
+        "device_data",
+        "doctor_access",
+        "location",
+        "notifications",
+        "data_sharing",
+        "terms_of_service",
+        "privacy_policy",
+      ],
     },
   },
 } as const
