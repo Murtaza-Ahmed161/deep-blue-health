@@ -13,6 +13,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { ForgotPasswordDialog } from "@/components/auth/ForgotPasswordDialog";
 import { ResetPasswordForm } from "@/components/auth/ResetPasswordForm";
 import TwoFactorVerify from "@/components/auth/TwoFactorVerify";
+import { BetaInviteForm } from "@/components/auth/BetaInviteForm";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -33,6 +34,10 @@ const Auth = () => {
   // 2FA state
   const [show2FA, setShow2FA] = useState(false);
   const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
+
+  // Beta invite state
+  const [showBetaInvite, setShowBetaInvite] = useState(false);
+  const [validatedInviteCode, setValidatedInviteCode] = useState<string | null>(null);
 
   // Check for password reset flow
   useEffect(() => {
@@ -199,6 +204,52 @@ const Auth = () => {
     );
   }
 
+  // Show beta invite form when switching to signup (for new users)
+  const handleTabChange = (value: string) => {
+    const goingToSignup = value === "signup";
+    setIsLogin(!goingToSignup);
+    
+    // Show beta invite form for new signups (skip if already validated)
+    if (goingToSignup && !validatedInviteCode) {
+      setShowBetaInvite(true);
+    }
+  };
+
+  const handleBetaCodeValidated = (code: string) => {
+    setValidatedInviteCode(code);
+    setShowBetaInvite(false);
+  };
+
+  const handleSkipBetaInvite = () => {
+    setShowBetaInvite(false);
+    setValidatedInviteCode("SKIPPED");
+  };
+
+  // Show beta invite form
+  if (showBetaInvite && !isLogin) {
+    return (
+      <div className="min-h-screen bg-muted flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <Button
+            variant="ghost"
+            onClick={() => {
+              setShowBetaInvite(false);
+              setIsLogin(true);
+            }}
+            className="mb-6"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Login
+          </Button>
+          <BetaInviteForm 
+            onValidCode={handleBetaCodeValidated}
+            onSkip={handleSkipBetaInvite}
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-muted flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -216,10 +267,15 @@ const Auth = () => {
             <CardTitle className="text-2xl">NeuralTrace</CardTitle>
             <CardDescription>
               {isLogin ? "Sign in to access your dashboard" : "Create your account"}
+              {validatedInviteCode && validatedInviteCode !== "SKIPPED" && !isLogin && (
+                <span className="block mt-1 text-xs text-primary">
+                  Beta Access: {validatedInviteCode}
+                </span>
+              )}
             </CardDescription>
           </CardHeader>
 
-          <Tabs value={isLogin ? "login" : "signup"} onValueChange={(v) => setIsLogin(v === "login")}>
+          <Tabs value={isLogin ? "login" : "signup"} onValueChange={handleTabChange}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="login">Login</TabsTrigger>
               <TabsTrigger value="signup">Sign Up</TabsTrigger>
