@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { ForgotPasswordDialog } from "@/components/auth/ForgotPasswordDialog";
 import { ResetPasswordForm } from "@/components/auth/ResetPasswordForm";
+import TwoFactorVerify from "@/components/auth/TwoFactorVerify";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -28,6 +29,10 @@ const Auth = () => {
   const [licenseNumber, setLicenseNumber] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showResetForm, setShowResetForm] = useState(false);
+  
+  // 2FA state
+  const [show2FA, setShow2FA] = useState(false);
+  const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
 
   // Check for password reset flow
   useEffect(() => {
@@ -47,6 +52,8 @@ const Auth = () => {
         navigate('/dashboard');
       } else if (role === 'patient') {
         navigate('/patient-dashboard');
+      } else if (role === 'admin') {
+        navigate('/admin');
       }
     }
   }, [user, role, loading, navigate]);
@@ -62,6 +69,17 @@ const Auth = () => {
       });
 
       if (error) throw error;
+
+      // Check if MFA is required
+      const { data: factorsData } = await supabase.auth.mfa.listFactors();
+      const verifiedFactor = factorsData?.totp?.find(f => f.status === 'verified');
+      
+      if (verifiedFactor) {
+        // User has 2FA enabled, show verification screen
+        setMfaFactorId(verifiedFactor.id);
+        setShow2FA(true);
+        return;
+      }
 
       toast({
         title: "Login successful",
@@ -79,6 +97,23 @@ const Auth = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handle2FASuccess = () => {
+    setShow2FA(false);
+    setMfaFactorId(null);
+    toast({
+      title: "Login successful",
+      description: "Welcome back to NeuralTrace!",
+    });
+    // Navigation handled by useEffect based on role
+  };
+
+  const handle2FACancel = async () => {
+    await supabase.auth.signOut();
+    setShow2FA(false);
+    setMfaFactorId(null);
+    setPassword("");
   };
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -147,6 +182,19 @@ const Auth = () => {
     return (
       <div className="min-h-screen bg-muted flex items-center justify-center p-4">
         <ResetPasswordForm />
+      </div>
+    );
+  }
+
+  // Show 2FA verification if needed
+  if (show2FA && mfaFactorId) {
+    return (
+      <div className="min-h-screen bg-muted flex items-center justify-center p-4">
+        <TwoFactorVerify
+          factorId={mfaFactorId}
+          onSuccess={handle2FASuccess}
+          onCancel={handle2FACancel}
+        />
       </div>
     );
   }

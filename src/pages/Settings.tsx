@@ -11,6 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import NotificationSettings from "@/components/settings/NotificationSettings";
+import TwoFactorSetup from "@/components/settings/TwoFactorSetup";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -197,12 +198,16 @@ const Settings = () => {
             <NotificationSettings />
           </TabsContent>
 
-          <TabsContent value="security">
+          <TabsContent value="security" className="space-y-6">
+            {/* Two-Factor Authentication */}
+            <TwoFactorSetup />
+
+            {/* Password Change */}
             <Card>
               <CardHeader>
-                <CardTitle>Security Settings</CardTitle>
+                <CardTitle>Change Password</CardTitle>
                 <CardDescription>
-                  Manage your password and security preferences
+                  Update your password to keep your account secure
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -232,8 +237,6 @@ const Settings = () => {
                     placeholder="Confirm new password"
                   />
                 </div>
-
-                <Separator />
 
                 <Button>Update Password</Button>
               </CardContent>
