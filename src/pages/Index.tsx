@@ -164,8 +164,26 @@ const Index = () => {
 
       {/* Footer */}
       <footer className="border-t border-border py-8">
-        <div className="container mx-auto px-4 text-center text-muted-foreground">
-          <p>&copy; 2024 NeuralTrace. HIPAA Compliant Healthcare Technology.</p>
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-muted-foreground">
+              &copy; 2024 NeuralTrace. HIPAA Compliant Healthcare Technology.
+            </p>
+            <div className="flex items-center gap-6">
+              <button 
+                onClick={() => navigate('/about')} 
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                About
+              </button>
+              <button 
+                onClick={() => navigate('/support')} 
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                Support
+              </button>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
