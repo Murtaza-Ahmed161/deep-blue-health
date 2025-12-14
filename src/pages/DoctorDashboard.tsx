@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Brain, Activity, Bell, LogOut, Users, TrendingUp, AlertCircle, Menu } from "lucide-react";
+import { Brain, Activity, Bell, LogOut, Users, TrendingUp, AlertCircle, Menu, Info, HelpCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import PatientCard from "@/components/dashboard/PatientCard";
@@ -152,6 +152,14 @@ const DoctorDashboard = () => {
             {/* Desktop Actions */}
             <div className="hidden md:flex items-center gap-4">
               <FeedbackButton />
+              <Button variant="ghost" size="sm" onClick={() => navigate('/about')}>
+                <Info className="mr-2 h-4 w-4" />
+                About
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => navigate('/support')}>
+                <HelpCircle className="mr-2 h-4 w-4" />
+                Support
+              </Button>
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="h-5 w-5" />
                 <span className="absolute top-0 right-0 h-2 w-2 bg-destructive rounded-full" />
@@ -184,6 +192,14 @@ const DoctorDashboard = () => {
                     <p className="text-sm text-muted-foreground">Cardiology</p>
                   </div>
                   <FeedbackButton variant="outline" size="default" />
+                  <Button variant="outline" onClick={() => navigate('/about')} className="w-full justify-start">
+                    <Info className="mr-2 h-4 w-4" />
+                    About
+                  </Button>
+                  <Button variant="outline" onClick={() => navigate('/support')} className="w-full justify-start">
+                    <HelpCircle className="mr-2 h-4 w-4" />
+                    Support
+                  </Button>
                   <Button variant="outline" className="w-full justify-start relative">
                     <Bell className="mr-2 h-4 w-4" />
                     Notifications

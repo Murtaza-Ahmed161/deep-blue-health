@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Brain, LogOut, Users, Activity, MessageSquare, TrendingUp, AlertCircle, Clock, RefreshCw } from "lucide-react";
+import { Brain, LogOut, Users, Activity, MessageSquare, TrendingUp, AlertCircle, Clock, RefreshCw, Info, HelpCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import FeedbackButton from "@/components/feedback/FeedbackButton";
@@ -233,6 +233,14 @@ const AdminDashboard = () => {
               >
                 <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
                 Refresh
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => navigate('/about')} className="hidden sm:flex">
+                <Info className="h-4 w-4 mr-2" />
+                About
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => navigate('/support')} className="hidden sm:flex">
+                <HelpCircle className="h-4 w-4 mr-2" />
+                Support
               </Button>
               <FeedbackButton />
               <div className="text-right hidden sm:block">

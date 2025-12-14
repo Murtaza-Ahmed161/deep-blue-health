@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Heart, Activity, Thermometer, Droplet, LogOut, Settings, User, Menu } from "lucide-react";
+import { Heart, Activity, Thermometer, Droplet, LogOut, Settings, User, Menu, Info, HelpCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -125,6 +125,14 @@ const PatientDashboard = () => {
             {/* Desktop Actions */}
             <div className="hidden md:flex items-center gap-2">
               <FeedbackButton />
+              <Button variant="ghost" size="sm" onClick={() => navigate('/about')}>
+                <Info className="mr-2 h-4 w-4" />
+                About
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => navigate('/support')}>
+                <HelpCircle className="mr-2 h-4 w-4" />
+                Support
+              </Button>
               <Button variant="outline" onClick={() => navigate('/settings')}>
                 <Settings className="mr-2 h-4 w-4" />
                 Settings
@@ -145,6 +153,14 @@ const PatientDashboard = () => {
               <SheetContent>
                 <div className="flex flex-col gap-4 mt-8">
                   <FeedbackButton variant="outline" size="default" />
+                  <Button variant="outline" onClick={() => navigate('/about')} className="w-full justify-start">
+                    <Info className="mr-2 h-4 w-4" />
+                    About
+                  </Button>
+                  <Button variant="outline" onClick={() => navigate('/support')} className="w-full justify-start">
+                    <HelpCircle className="mr-2 h-4 w-4" />
+                    Support
+                  </Button>
                   <Button variant="outline" onClick={() => navigate('/settings')} className="w-full justify-start">
                     <Settings className="mr-2 h-4 w-4" />
                     Settings
