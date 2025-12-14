@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Brain, LogOut, Users, Activity, MessageSquare, TrendingUp, AlertCircle, Clock, RefreshCw, Info, HelpCircle } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import FeedbackButton from "@/components/feedback/FeedbackButton";
@@ -225,6 +226,7 @@ const AdminDashboard = () => {
               <span className="text-2xl font-bold text-primary">NeuralTrace Admin</span>
             </div>
             <div className="flex items-center gap-4">
+              <ThemeToggle />
               <Button 
                 variant="outline" 
                 size="sm" 

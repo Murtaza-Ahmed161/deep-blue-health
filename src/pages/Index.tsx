@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Activity, Brain, Users, Shield, HeartPulse, UserCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import heroImage from "@/assets/hero-medical.jpg";
 
 const Index = () => {
@@ -49,9 +50,12 @@ const Index = () => {
             <Brain className="h-8 w-8 text-primary" />
             <span className="text-2xl font-bold text-primary">NeuralTrace</span>
           </div>
-          <Button onClick={() => navigate('/auth')} variant="default">
-            Doctor Login
-          </Button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Button onClick={() => navigate('/auth')} variant="default">
+              Doctor Login
+            </Button>
+          </div>
         </div>
       </nav>
 
