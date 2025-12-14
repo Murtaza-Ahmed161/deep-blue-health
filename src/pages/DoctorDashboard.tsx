@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Brain, Activity, Bell, LogOut, Users, TrendingUp, AlertCircle, Menu, Info, HelpCircle } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import PatientCard from "@/components/dashboard/PatientCard";
@@ -151,6 +152,7 @@ const DoctorDashboard = () => {
             
             {/* Desktop Actions */}
             <div className="hidden md:flex items-center gap-4">
+              <ThemeToggle />
               <FeedbackButton />
               <Button variant="ghost" size="sm" onClick={() => navigate('/about')}>
                 <Info className="mr-2 h-4 w-4" />
@@ -187,9 +189,12 @@ const DoctorDashboard = () => {
               </SheetTrigger>
               <SheetContent>
                 <div className="flex flex-col gap-4 mt-8">
-                  <div className="p-4 rounded-lg bg-muted">
-                    <p className="font-medium">Dr. John Smith</p>
-                    <p className="text-sm text-muted-foreground">Cardiology</p>
+                  <div className="flex items-center justify-between p-4 rounded-lg bg-muted">
+                    <div>
+                      <p className="font-medium">Dr. John Smith</p>
+                      <p className="text-sm text-muted-foreground">Cardiology</p>
+                    </div>
+                    <ThemeToggle />
                   </div>
                   <FeedbackButton variant="outline" size="default" />
                   <Button variant="outline" onClick={() => navigate('/about')} className="w-full justify-start">

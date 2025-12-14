@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Heart, Activity, Thermometer, Droplet, LogOut, Settings, User, Menu, Info, HelpCircle } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -124,6 +125,7 @@ const PatientDashboard = () => {
             
             {/* Desktop Actions */}
             <div className="hidden md:flex items-center gap-2">
+              <ThemeToggle />
               <FeedbackButton />
               <Button variant="ghost" size="sm" onClick={() => navigate('/about')}>
                 <Info className="mr-2 h-4 w-4" />
@@ -152,6 +154,9 @@ const PatientDashboard = () => {
               </SheetTrigger>
               <SheetContent>
                 <div className="flex flex-col gap-4 mt-8">
+                  <div className="flex justify-end mb-2">
+                    <ThemeToggle />
+                  </div>
                   <FeedbackButton variant="outline" size="default" />
                   <Button variant="outline" onClick={() => navigate('/about')} className="w-full justify-start">
                     <Info className="mr-2 h-4 w-4" />
