@@ -475,9 +475,12 @@ export type Database = {
           blood_pressure_systolic: number | null
           created_at: string
           device_type: string | null
+          entered_by: string | null
           heart_rate: number | null
           id: string
           oxygen_saturation: number | null
+          respiratory_rate: number | null
+          source: string | null
           synced_at: string
           temperature: number | null
           user_id: string
@@ -487,9 +490,12 @@ export type Database = {
           blood_pressure_systolic?: number | null
           created_at?: string
           device_type?: string | null
+          entered_by?: string | null
           heart_rate?: number | null
           id?: string
           oxygen_saturation?: number | null
+          respiratory_rate?: number | null
+          source?: string | null
           synced_at?: string
           temperature?: number | null
           user_id: string
@@ -499,9 +505,12 @@ export type Database = {
           blood_pressure_systolic?: number | null
           created_at?: string
           device_type?: string | null
+          entered_by?: string | null
           heart_rate?: number | null
           id?: string
           oxygen_saturation?: number | null
+          respiratory_rate?: number | null
+          source?: string | null
           synced_at?: string
           temperature?: number | null
           user_id?: string
