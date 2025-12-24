@@ -1,6 +1,10 @@
 // Bluetooth Service Abstraction for Wearable Devices
-// This service provides an abstracted interface for connecting to wearable devices
-// Currently simulated for MVP, designed for easy integration with real Bluetooth APIs
+// 
+// ⚠️ MEDICAL SAFETY: Mock mode is DISABLED by default
+// This service will NOT generate fake vitals or simulate device connections.
+// Real Bluetooth integration must be implemented before use in production.
+//
+// TODO: Implement real Bluetooth API integration (Web Bluetooth API or native bridge)
 
 export interface WearableVitals {
   heartRate: number;
@@ -28,6 +32,9 @@ type VitalsCallback = (vitals: WearableVitals) => void;
 type StatusCallback = (status: ConnectionStatus) => void;
 type DeviceCallback = (device: WearableDevice | null) => void;
 
+// CRITICAL: Mock mode flag - MUST be false in production
+const MOCK_MODE = false;
+
 class BluetoothService {
   private status: ConnectionStatus = 'disconnected';
   private connectedDevice: WearableDevice | null = null;
@@ -36,41 +43,8 @@ class BluetoothService {
   private statusCallbacks: StatusCallback[] = [];
   private deviceCallbacks: DeviceCallback[] = [];
 
-  // Simulate available devices for scanning
-  private mockDevices: WearableDevice[] = [
-    {
-      id: 'google-fit-001',
-      name: 'Google Fit (Pixel Watch)',
-      type: 'smartwatch',
-      manufacturer: 'Google',
-      connected: false,
-      batteryLevel: 85,
-    },
-    {
-      id: 'apple-health-001',
-      name: 'Apple Watch Series 9',
-      type: 'smartwatch',
-      manufacturer: 'Apple',
-      connected: false,
-      batteryLevel: 72,
-    },
-    {
-      id: 'fitbit-001',
-      name: 'Fitbit Charge 5',
-      type: 'fitness_tracker',
-      manufacturer: 'Fitbit',
-      connected: false,
-      batteryLevel: 91,
-    },
-    {
-      id: 'garmin-001',
-      name: 'Garmin Venu 2',
-      type: 'fitness_tracker',
-      manufacturer: 'Garmin',
-      connected: false,
-      batteryLevel: 68,
-    },
-  ];
+  // Mock devices - ONLY used if MOCK_MODE is true (disabled by default)
+  private mockDevices: WearableDevice[] = [];
 
   getStatus(): ConnectionStatus {
     return this.status;
@@ -81,31 +55,29 @@ class BluetoothService {
   }
 
   async scanForDevices(): Promise<WearableDevice[]> {
-    // Simulate Bluetooth scanning delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    return this.mockDevices;
+    if (MOCK_MODE) {
+      // MOCK MODE DISABLED - This should never execute in production
+      console.warn('⚠️ WARNING: Mock mode is disabled. Bluetooth scanning not available.');
+      throw new Error('Bluetooth service not configured. Real device integration required.');
+    }
+    
+    // TODO: Implement real Bluetooth scanning using Web Bluetooth API
+    // Example: navigator.bluetooth.requestDevice({ filters: [...] })
+    throw new Error('Bluetooth scanning not yet implemented. Real device integration required.');
   }
 
   async connect(deviceId: string): Promise<boolean> {
-    this.updateStatus('connecting');
-    
-    // Simulate connection process
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    const device = this.mockDevices.find(d => d.id === deviceId);
-    if (!device) {
+    if (MOCK_MODE) {
+      // MOCK MODE DISABLED - This should never execute in production
+      console.warn('⚠️ WARNING: Mock mode is disabled. Device connection not available.');
       this.updateStatus('error');
-      return false;
+      throw new Error('Bluetooth service not configured. Real device integration required.');
     }
-
-    this.connectedDevice = { ...device, connected: true, lastSync: new Date() };
-    this.updateDevice(this.connectedDevice);
-    this.updateStatus('connected');
     
-    // Start simulated vitals streaming
-    this.startVitalsStream();
-    
-    return true;
+    // TODO: Implement real Bluetooth connection using Web Bluetooth API
+    // Example: const device = await navigator.bluetooth.requestDevice({ ... })
+    this.updateStatus('error');
+    throw new Error('Bluetooth connection not yet implemented. Real device integration required.');
   }
 
   async disconnect(): Promise<void> {
@@ -116,11 +88,10 @@ class BluetoothService {
   }
 
   private startVitalsStream(): void {
-    // Stream vitals every 5 seconds (simulated)
-    this.vitalsInterval = setInterval(() => {
-      const vitals = this.generateMockVitals();
-      this.vitalsCallbacks.forEach(cb => cb(vitals));
-    }, 5000);
+    // MOCK MODE DISABLED - No fake vitals generation
+    // TODO: Implement real vitals streaming from connected Bluetooth device
+    // This should read from the device's GATT characteristics
+    console.warn('⚠️ Vitals streaming not available. Real device integration required.');
   }
 
   private stopVitalsStream(): void {
@@ -130,25 +101,8 @@ class BluetoothService {
     }
   }
 
-  private generateMockVitals(): WearableVitals {
-    // Generate realistic vitals with slight variations
-    const baseHR = 70 + Math.random() * 20;
-    const baseSystolic = 115 + Math.random() * 15;
-    const baseDiastolic = 75 + Math.random() * 10;
-    const baseO2 = 96 + Math.random() * 3;
-    const baseTemp = 97.5 + Math.random() * 1.5;
-    const baseRR = 14 + Math.random() * 4;
-
-    return {
-      heartRate: Math.round(baseHR),
-      bloodPressureSystolic: Math.round(baseSystolic),
-      bloodPressureDiastolic: Math.round(baseDiastolic),
-      oxygenSaturation: Math.round(baseO2),
-      temperature: +baseTemp.toFixed(1),
-      respiratoryRate: Math.round(baseRR),
-      timestamp: new Date(),
-    };
-  }
+  // REMOVED: generateMockVitals() - No fake vitals generation allowed
+  // Real vitals must come from actual device connections
 
   onVitals(callback: VitalsCallback): () => void {
     this.vitalsCallbacks.push(callback);

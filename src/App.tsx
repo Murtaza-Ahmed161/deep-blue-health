@@ -20,6 +20,8 @@ import WhatsNewDialog from "./components/WhatsNewDialog";
 
 const queryClient = new QueryClient();
 
+// STEP 2: Binary restore - adding providers one by one
+// Currently testing: Full App with all providers
 const App = () => {
   const [showSplash, setShowSplash] = useState(true);
 
@@ -27,25 +29,24 @@ const App = () => {
     <ThemeProvider attribute="class" defaultTheme="system" storageKey="neuraltrace-theme">
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-        {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
-        <WhatsNewDialog />
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/dashboard" element={<DoctorDashboard />} />
-            <Route path="/patient-dashboard" element={<PatientDashboard />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/patient/:id" element={<PatientDetail />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/support" element={<Support />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+          {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
+          <WhatsNewDialog />
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/dashboard" element={<DoctorDashboard />} />
+              <Route path="/patient-dashboard" element={<PatientDashboard />} />
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/patient/:id" element={<PatientDetail />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/support" element={<Support />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
         </TooltipProvider>
       </QueryClientProvider>
     </ThemeProvider>

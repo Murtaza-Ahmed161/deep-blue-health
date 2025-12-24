@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,15 +21,44 @@ const ReportUpload = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Mock file URL - in production, would upload to storage
-      const mockFileUrl = `https://example.com/reports/${file.name}`;
+      // ⚠️ SAFETY: Check if Supabase Storage is configured
+      // TODO: Replace with actual Supabase Storage bucket configuration
+      const STORAGE_BUCKET = 'medical-reports'; // This should come from env/config
+      
+      // Upload file to Supabase Storage
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+      
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from(STORAGE_BUCKET)
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
 
-      // Insert report record
+      if (uploadError) {
+        // If storage is not configured, block the upload
+        if (uploadError.message.includes('Bucket') || uploadError.message.includes('not found')) {
+          throw new Error('File storage is not configured. Please contact support to enable report uploads.');
+        }
+        throw uploadError;
+      }
+
+      // Get public URL for the uploaded file
+      const { data: urlData } = supabase.storage
+        .from(STORAGE_BUCKET)
+        .getPublicUrl(fileName);
+
+      if (!urlData?.publicUrl) {
+        throw new Error('Failed to get file URL after upload');
+      }
+
+      // Insert report record with real storage URL
       const { data: report, error: insertError } = await supabase
         .from('medical_reports')
         .insert({
           user_id: user.id,
-          file_url: mockFileUrl,
+          file_url: urlData.publicUrl,
           file_name: file.name,
           file_type: file.type,
           status: 'pending'
@@ -81,9 +110,9 @@ const ReportUpload = () => {
     }
   };
 
-  useState(() => {
+  useEffect(() => {
     loadReports();
-  });
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -122,6 +151,9 @@ const ReportUpload = () => {
               )}
               <p className="text-sm text-muted-foreground">
                 {uploading ? 'Uploading and analyzing...' : 'Click to upload PDF, JPG, or PNG'}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Files are stored securely in Supabase Storage
               </p>
             </div>
           </label>

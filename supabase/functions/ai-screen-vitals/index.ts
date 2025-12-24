@@ -21,7 +21,12 @@ serve(async (req) => {
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY')!;
+    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
+
+    // Guard against dual backends
+    if (lovableApiKey) {
+      console.warn('⚠️ WARNING: LOVABLE_API_KEY detected. Lovable Cloud must not be used in production. Supabase is the only backend.');
+    }
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -56,7 +61,67 @@ Respond in JSON format:
   "confidence": 0.95
 }`;
 
-    console.log('Calling Lovable AI for vitals screening...');
+    // AI API key is optional - if not provided, return basic analysis
+    if (!lovableApiKey) {
+      console.warn('LOVABLE_API_KEY not set. Using basic rule-based analysis instead of AI.');
+      
+      // Basic rule-based analysis as fallback
+      const isCritical = heartRate < 50 || heartRate > 120 || 
+                        bloodPressureSystolic > 180 || bloodPressureSystolic < 90 ||
+                        oxygenSaturation < 90 || temperature > 39 || temperature < 35;
+      const isWarning = heartRate < 60 || heartRate > 100 ||
+                       bloodPressureSystolic > 140 || bloodPressureSystolic < 100 ||
+                       oxygenSaturation < 95 || temperature > 38 || temperature < 36;
+
+      const analysisResult = {
+        severity: isCritical ? 'critical' : (isWarning ? 'warning' : 'normal'),
+        anomaly_detected: isCritical || isWarning,
+        explanation: isCritical 
+          ? 'Critical vital signs detected. Immediate medical attention required.'
+          : isWarning 
+          ? 'Some vital signs are outside normal range. Monitor closely.'
+          : 'All vital signs within normal range.',
+        recommendations: isCritical 
+          ? ['Seek immediate medical attention', 'Monitor continuously', 'Contact healthcare provider']
+          : isWarning
+          ? ['Continue monitoring', 'Consider consulting healthcare provider']
+          : ['Continue regular monitoring'],
+        confidence: 0.85
+      };
+
+      // Store screening result in database
+      const { data: screeningResult, error: insertError } = await supabase
+        .from('ai_screening_results')
+        .insert({
+          user_id: user.id,
+          vitals_id: vitalsId,
+          confidence_level: analysisResult.confidence,
+          anomaly_detected: analysisResult.anomaly_detected,
+          explanation: analysisResult.explanation,
+          severity: analysisResult.severity,
+          recommendations: analysisResult.recommendations || []
+        })
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error('Error storing screening result:', insertError);
+        throw insertError;
+      }
+
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          result: screeningResult 
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        }
+      );
+    }
+
+    console.log('Calling AI service for vitals screening...');
     
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',

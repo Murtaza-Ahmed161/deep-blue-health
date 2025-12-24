@@ -12,10 +12,10 @@ interface PatientCardProps {
     status: "normal" | "warning" | "critical";
     lastReading: string;
     vitals: {
-      heartRate: number;
+      heartRate: number | null;
       bloodPressure: string;
-      temperature: number;
-      oxygen: number;
+      temperature: number | null;
+      oxygen: number | null;
     };
   };
   onClick?: () => void;
@@ -47,7 +47,7 @@ const PatientCard = ({ patient, onClick }: PatientCardProps) => {
           <Heart className="h-4 w-4 text-destructive" />
           <div>
             <p className="text-xs text-muted-foreground">Heart Rate</p>
-            <p className="text-sm font-medium">{patient.vitals.heartRate} bpm</p>
+            <p className="text-sm font-medium">{patient.vitals.heartRate !== null ? `${patient.vitals.heartRate} bpm` : 'N/A'}</p>
           </div>
         </div>
         
@@ -55,7 +55,7 @@ const PatientCard = ({ patient, onClick }: PatientCardProps) => {
           <Activity className="h-4 w-4 text-primary" />
           <div>
             <p className="text-xs text-muted-foreground">BP</p>
-            <p className="text-sm font-medium">{patient.vitals.bloodPressure}</p>
+            <p className="text-sm font-medium">{patient.vitals.bloodPressure || 'N/A'}</p>
           </div>
         </div>
         
@@ -63,7 +63,7 @@ const PatientCard = ({ patient, onClick }: PatientCardProps) => {
           <Thermometer className="h-4 w-4 text-warning" />
           <div>
             <p className="text-xs text-muted-foreground">Temp</p>
-            <p className="text-sm font-medium">{patient.vitals.temperature}°F</p>
+            <p className="text-sm font-medium">{patient.vitals.temperature !== null ? `${patient.vitals.temperature}°F` : 'N/A'}</p>
           </div>
         </div>
         
@@ -71,7 +71,7 @@ const PatientCard = ({ patient, onClick }: PatientCardProps) => {
           <Droplet className="h-4 w-4 text-secondary" />
           <div>
             <p className="text-xs text-muted-foreground">SpO2</p>
-            <p className="text-sm font-medium">{patient.vitals.oxygen}%</p>
+            <p className="text-sm font-medium">{patient.vitals.oxygen !== null ? `${patient.vitals.oxygen}%` : 'N/A'}</p>
           </div>
         </div>
       </div>

@@ -5,13 +5,63 @@ import type { Database } from './types';
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
+// CRITICAL: Hard block if Supabase is not configured
+// This prevents silent fallback to Lovable or other backends
+if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+  const errorMessage = 'CRITICAL: Supabase is required. Lovable backend is not allowed. Missing environment variables: ' +
+    (!SUPABASE_URL ? 'VITE_SUPABASE_URL ' : '') +
+    (!SUPABASE_PUBLISHABLE_KEY ? 'VITE_SUPABASE_PUBLISHABLE_KEY' : '');
+  
+  console.error(errorMessage, {
+    hasUrl: !!SUPABASE_URL,
+    hasKey: !!SUPABASE_PUBLISHABLE_KEY,
+  });
+  
+  // HARD BLOCK: Throw error to prevent app from running with wrong backend
+  throw new Error(errorMessage);
+}
+
+// CRITICAL: Validate Supabase URL is actually a Supabase URL, not Lovable
+if (SUPABASE_URL.includes('lovable.dev') || SUPABASE_URL.includes('lovable')) {
+  const errorMessage = 'CRITICAL: Supabase URL cannot be a Lovable URL. Lovable backend is not allowed.';
+  console.error(errorMessage, { url: SUPABASE_URL });
+  throw new Error(errorMessage);
+}
+
+// Validate URL format is a Supabase URL
+if (!SUPABASE_URL.includes('.supabase.co') && !SUPABASE_URL.includes('supabase')) {
+  console.warn('WARNING: Supabase URL does not appear to be a valid Supabase URL:', SUPABASE_URL);
+}
+
+// Guard against dual backends - Lovable Cloud must not be used
+if (typeof window !== 'undefined' && import.meta.env.LOVABLE_API_KEY) {
+  console.warn('⚠️ WARNING: LOVABLE_API_KEY detected. Lovable Cloud must not be used in production. Supabase is the only backend.');
+}
+
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-  auth: {
-    storage: localStorage,
-    persistSession: true,
-    autoRefreshToken: true,
-  }
-});
+// Create Supabase client - NO FALLBACKS, NO PLACEHOLDERS
+// If we reach here, env vars are validated and correct
+let supabase: ReturnType<typeof createClient<Database>>;
+
+try {
+  supabase = createClient<Database>(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY,
+    {
+      auth: {
+        storage: typeof window !== 'undefined' ? localStorage : undefined,
+        persistSession: true,
+        autoRefreshToken: true,
+      }
+    }
+  );
+} catch (error) {
+  const errorMessage = 'CRITICAL: Failed to initialize Supabase client. Lovable backend is not allowed.';
+  console.error(errorMessage, error);
+  // HARD BLOCK: Do not create placeholder client
+  throw new Error(errorMessage);
+}
+
+export { supabase };

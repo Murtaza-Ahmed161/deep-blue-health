@@ -1,120 +1,167 @@
+/**
+ * Real-time vitals streaming hook using Supabase Realtime
+ * 
+ * This hook subscribes to Supabase Realtime for vitals updates.
+ * NO FAKE DATA - only real vitals from the database.
+ */
 import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface VitalReading {
-  heartRate: number;
-  bloodPressure: { systolic: number; diastolic: number };
-  temperature: number;
-  oxygen: number;
+  heartRate: number | null;
+  bloodPressure: { systolic: number | null; diastolic: number | null };
+  temperature: number | null;
+  oxygen: number | null;
   timestamp: string;
 }
 
 export interface PatientVitals {
-  patientId: number;
+  patientId: string;
   readings: VitalReading[];
   status: 'normal' | 'warning' | 'critical';
 }
 
-const generateReading = (patientId: number, baseVitals: any): VitalReading => {
-  // Add realistic variation
-  const variance = patientId === 3 ? 0.15 : 0.05; // Patient 3 (Maria) has more variation
-  
-  const hr = Math.round(baseVitals.heartRate + (Math.random() - 0.5) * baseVitals.heartRate * variance);
-  const temp = +(baseVitals.temperature + (Math.random() - 0.5) * 0.5).toFixed(1);
-  const o2 = Math.round(baseVitals.oxygen + (Math.random() - 0.5) * 3);
-  
-  const [sys, dia] = baseVitals.bloodPressure.split('/').map(Number);
-  const newSys = Math.round(sys + (Math.random() - 0.5) * sys * variance);
-  const newDia = Math.round(dia + (Math.random() - 0.5) * dia * variance);
-
-  return {
-    heartRate: hr,
-    bloodPressure: { systolic: newSys, diastolic: newDia },
-    temperature: temp,
-    oxygen: o2,
-    timestamp: new Date().toISOString(),
-  };
-};
-
-const determineStatus = (reading: VitalReading): 'normal' | 'warning' | 'critical' => {
-  if (
-    reading.heartRate > 140 || reading.heartRate < 40 ||
-    reading.bloodPressure.systolic > 160 ||
-    reading.temperature > 100 ||
-    reading.oxygen < 94
-  ) {
-    return 'critical';
-  }
-  
-  if (
-    reading.heartRate > 100 || reading.heartRate < 50 ||
-    reading.bloodPressure.systolic > 140 ||
-    reading.temperature > 99 ||
-    reading.oxygen < 96
-  ) {
-    return 'warning';
-  }
-  
-  return 'normal';
-};
-
-export const useVitalsStream = (patients: any[]) => {
-  const [vitalsData, setVitalsData] = useState<Map<number, PatientVitals>>(new Map());
-  const [alerts, setAlerts] = useState<Array<{ id: string; patientId: number; patient: string; message: string; severity: 'critical' | 'warning'; time: string }>>([]);
+export const useVitalsStream = (patientIds: string[]) => {
+  const [vitalsData, setVitalsData] = useState<Map<string, PatientVitals>>(new Map());
+  const [hasData, setHasData] = useState(false);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setVitalsData(prev => {
-        const newVitalsData = new Map<number, PatientVitals>(prev);
-        const newAlerts: typeof alerts = [];
+    if (patientIds.length === 0) {
+      setVitalsData(new Map());
+      setHasData(false);
+      return;
+    }
 
-        patients.forEach((patient) => {
-          const newReading = generateReading(patient.id, patient.vitals);
-          const status = determineStatus(newReading);
-          
-          const existing = prev.get(patient.id);
-          const readings = existing ? [...existing.readings.slice(-23), newReading] : [newReading];
-          
-          newVitalsData.set(patient.id, {
-            patientId: patient.id,
-            readings,
-            status,
-          });
+    // Fetch initial vitals for all patients
+    const fetchInitialVitals = async () => {
+      const vitalsMap = new Map<string, PatientVitals>();
 
-          // Generate alerts
-          if (status === 'critical') {
-            if (newReading.heartRate > 140 || newReading.heartRate < 40) {
-              newAlerts.push({
-                id: `${patient.id}-hr-${Date.now()}`,
-                patientId: patient.id,
-                patient: patient.name,
-                message: `${newReading.heartRate > 140 ? 'Elevated' : 'Low'} heart rate detected: ${newReading.heartRate} bpm`,
-                severity: 'critical',
-                time: 'Just now',
-              });
-            }
-            if (newReading.bloodPressure.systolic > 160) {
-              newAlerts.push({
-                id: `${patient.id}-bp-${Date.now()}`,
-                patientId: patient.id,
-                patient: patient.name,
-                message: `High blood pressure: ${newReading.bloodPressure.systolic}/${newReading.bloodPressure.diastolic}`,
-                severity: 'critical',
-                time: 'Just now',
-              });
-            }
-          }
-        });
+      for (const patientId of patientIds) {
+        // Get last 24 hours of vitals
+        const { data: vitals, error } = await supabase
+          .from('vitals')
+          .select('*')
+          .eq('user_id', patientId)
+          .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+          .order('created_at', { ascending: true });
 
-        if (newAlerts.length > 0) {
-          setAlerts(prev => [...newAlerts, ...prev].slice(0, 10));
+        if (error) {
+          console.error(`Error fetching vitals for patient ${patientId}:`, error);
+          continue;
         }
 
-        return newVitalsData;
-      });
-    }, 800); // Optimized: Update every 800ms for <1s lag
+        // Get latest AI screening to determine status
+        const { data: latestScreening } = await supabase
+          .from('ai_screening_results')
+          .select('severity')
+          .eq('user_id', patientId)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
 
-    return () => clearInterval(interval);
-  }, [patients]);
+        const status = (latestScreening?.severity as 'normal' | 'warning' | 'critical') || 'normal';
 
-  return { vitalsData, alerts };
+        const readings: VitalReading[] = (vitals || []).map(v => ({
+          heartRate: v.heart_rate,
+          bloodPressure: {
+            systolic: v.blood_pressure_systolic,
+            diastolic: v.blood_pressure_diastolic,
+          },
+          temperature: v.temperature ? Number(v.temperature) : null,
+          oxygen: v.oxygen_saturation,
+          timestamp: v.created_at,
+        }));
+
+        if (readings.length > 0) {
+          setHasData(true);
+        }
+
+        vitalsMap.set(patientId, {
+          patientId,
+          readings,
+          status,
+        });
+      }
+
+      setVitalsData(vitalsMap);
+    };
+
+    fetchInitialVitals();
+
+    // Subscribe to realtime vitals updates
+    const channel = supabase
+      .channel('vitals-stream')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'vitals',
+          filter: `user_id=in.(${patientIds.join(',')})`,
+        },
+        async (payload) => {
+          const newVital = payload.new as any;
+          const patientId = newVital.user_id;
+
+          // Update vitals for this patient
+          setVitalsData(prev => {
+            const existing = prev.get(patientId);
+            const newReading: VitalReading = {
+              heartRate: newVital.heart_rate,
+              bloodPressure: {
+                systolic: newVital.blood_pressure_systolic,
+                diastolic: newVital.blood_pressure_diastolic,
+              },
+              temperature: newVital.temperature ? Number(newVital.temperature) : null,
+              oxygen: newVital.oxygen_saturation,
+              timestamp: newVital.created_at,
+            };
+
+            const readings = existing
+              ? [...existing.readings.slice(-23), newReading]
+              : [newReading];
+
+            // Get latest status from AI screening
+            supabase
+              .from('ai_screening_results')
+              .select('severity')
+              .eq('user_id', patientId)
+              .order('created_at', { ascending: false })
+              .limit(1)
+              .single()
+              .then(({ data: screening }) => {
+                const status = (screening?.severity as 'normal' | 'warning' | 'critical') || 'normal';
+                
+                setVitalsData(prev => {
+                  const updated = new Map(prev);
+                  const current = updated.get(patientId);
+                  if (current) {
+                    updated.set(patientId, {
+                      ...current,
+                      status,
+                    });
+                  }
+                  return updated;
+                });
+              });
+
+            const updated = new Map(prev);
+            updated.set(patientId, {
+              patientId,
+              readings,
+              status: existing?.status || 'normal',
+            });
+            setHasData(true);
+            return updated;
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [patientIds]);
+
+  return { vitalsData, hasData };
 };

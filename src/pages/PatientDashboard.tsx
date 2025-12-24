@@ -1,7 +1,8 @@
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LogOut, Settings, User, Menu, Info, HelpCircle } from "lucide-react";
@@ -24,7 +25,29 @@ import { useVitals } from "@/hooks/useVitals";
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
-  const { profile, signOut } = useAuth();
+  const { user, profile, signOut, role, loading: authLoading } = useAuth();
+  const [profileError, setProfileError] = useState<string | null>(null);
+
+  // CRITICAL: Guard clause - block access without valid profile
+  useEffect(() => {
+    if (!authLoading) {
+      if (!user) {
+        navigate('/auth');
+        return;
+      }
+      if (!profile) {
+        setProfileError('User profile missing — DB sync failed. Please contact support.');
+        console.error('CRITICAL: Patient dashboard accessed without profile', { userId: user.id });
+        return;
+      }
+      if (role !== 'patient') {
+        console.error('CRITICAL: Non-patient accessed patient dashboard', { userId: user.id, role });
+        navigate('/');
+        return;
+      }
+      setProfileError(null);
+    }
+  }, [user, profile, role, authLoading, navigate]);
   
   // Unified vitals management
   const {
@@ -69,15 +92,38 @@ const PatientDashboard = () => {
     }
   }, [currentVitals, sendNotification]);
 
-  const aiInsights = [
-    {
-      id: "1",
-      type: "normal" as const,
-      message: "All vitals are within normal range. Keep up the good work!",
-      severity: "info" as const,
-      timestamp: "2 min ago",
-    },
-  ];
+  // Fetch real AI insights from database
+  const [aiInsights, setAiInsights] = useState<any[]>([]);
+  
+  useEffect(() => {
+    const fetchAIInsights = async () => {
+      if (!user) return;
+      
+      try {
+        const { data } = await supabase
+          .from('ai_screening_results')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(5);
+        
+        if (data) {
+          const insights = data.map(result => ({
+            id: result.id,
+            type: result.severity === 'critical' ? 'anomaly' as const : result.severity === 'warning' ? 'trend' as const : 'normal' as const,
+            message: result.explanation,
+            severity: result.severity === 'critical' ? 'critical' as const : result.severity === 'warning' ? 'warning' as const : 'info' as const,
+            timestamp: new Date(result.created_at).toLocaleString(),
+          }));
+          setAiInsights(insights);
+        }
+      } catch (error) {
+        console.error('Error fetching AI insights:', error);
+      }
+    };
+    
+    fetchAIInsights();
+  }, [user]);
 
   const handleLogout = async () => {
     await signOut();
@@ -87,6 +133,41 @@ const PatientDashboard = () => {
   const handleSaveManualVitals = async (vitals: Parameters<typeof saveVitals>[0]) => {
     return await saveVitals(vitals, 'manual');
   };
+
+  // Show error state if profile is missing
+  if (profileError) {
+    return (
+      <div className="min-h-screen bg-muted flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-destructive">Profile Missing</CardTitle>
+            <CardDescription>{profileError}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => navigate('/auth')} className="w-full">
+              Return to Login
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Show loading state
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-muted">
+        <div className="container mx-auto px-4 py-8">
+          <SkeletonCard />
+        </div>
+      </div>
+    );
+  }
+
+  // Final guard - should never reach here without profile, but double-check
+  if (!profile || role !== 'patient') {
+    return null;
+  }
 
   return (
     <>

@@ -1,44 +1,144 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Heart, Activity, Thermometer, Droplet, Save, CheckCircle } from "lucide-react";
+import { ArrowLeft, Heart, Activity, Thermometer, Droplet, Save, CheckCircle, Loader2 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+
+interface PatientProfile {
+  id: string;
+  full_name: string | null;
+  email: string;
+  created_at: string;
+}
+
+interface VitalReading {
+  heart_rate: number | null;
+  blood_pressure_systolic: number | null;
+  blood_pressure_diastolic: number | null;
+  temperature: number | null;
+  oxygen_saturation: number | null;
+  created_at: string;
+}
 
 const PatientDetail = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [notes, setNotes] = useState("");
   const [reviewStatus, setReviewStatus] = useState<"pending" | "reviewed" | "followup">("pending");
+  const [patient, setPatient] = useState<PatientProfile | null>(null);
+  const [vitalsData, setVitalsData] = useState<VitalReading[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [status, setStatus] = useState<"normal" | "warning" | "critical">("normal");
 
-  // Mock patient data - in real app this would come from API
-  const patient = {
-    id: Number(id),
-    name: id === "1" ? "Sarah Johnson" : id === "2" ? "Robert Chen" : "Maria Garcia",
-    age: id === "1" ? 68 : id === "2" ? 75 : 62,
-    condition: id === "1" ? "Hypertension" : id === "2" ? "Diabetes Type 2" : "Post-Surgery",
-    status: id === "1" ? "normal" : id === "2" ? "warning" : "critical",
+  // Fetch real patient data from Supabase
+  useEffect(() => {
+    if (!id) {
+      navigate("/dashboard");
+      return;
+    }
+
+    const fetchPatientData = async () => {
+      try {
+        setLoading(true);
+
+        // Fetch patient profile
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('id, full_name, email, created_at')
+          .eq('id', id)
+          .single();
+
+        if (profileError || !profile) {
+          toast({
+            title: "Patient not found",
+            description: "This patient does not exist in the database.",
+            variant: "destructive",
+          });
+          navigate("/dashboard");
+          return;
+        }
+
+        setPatient(profile);
+
+        // Fetch last 24 hours of vitals
+        const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+        const { data: vitals, error: vitalsError } = await supabase
+          .from('vitals')
+          .select('*')
+          .eq('user_id', id)
+          .gte('created_at', twentyFourHoursAgo)
+          .order('created_at', { ascending: true });
+
+        if (vitalsError) {
+          console.error('Error fetching vitals:', vitalsError);
+        } else {
+          setVitalsData(vitals || []);
+        }
+
+        // Fetch latest AI screening result for status
+        const { data: latestScreening } = await supabase
+          .from('ai_screening_results')
+          .select('severity')
+          .eq('user_id', id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+
+        if (latestScreening?.severity) {
+          setStatus(latestScreening.severity as 'normal' | 'warning' | 'critical');
+        }
+      } catch (error) {
+        console.error('Error fetching patient data:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load patient data.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPatientData();
+  }, [id, navigate, toast]);
+
+  // Get current vitals from latest reading
+  const latestVital = vitalsData.length > 0 ? vitalsData[vitalsData.length - 1] : null;
+  const currentVitals = latestVital ? {
+    heartRate: latestVital.heart_rate,
+    bloodPressure: latestVital.blood_pressure_systolic && latestVital.blood_pressure_diastolic
+      ? `${latestVital.blood_pressure_systolic}/${latestVital.blood_pressure_diastolic}`
+      : 'N/A',
+    temperature: latestVital.temperature ? latestVital.temperature.toFixed(1) : 'N/A',
+    oxygen: latestVital.oxygen_saturation,
+  } : {
+    heartRate: null,
+    bloodPressure: 'N/A',
+    temperature: 'N/A',
+    oxygen: null,
   };
 
-  // Mock 24h vitals data
-  const vitalsData = Array.from({ length: 24 }, (_, i) => ({
-    hour: `${i}:00`,
-    heartRate: 72 + Math.sin(i / 3) * 10 + (Math.random() - 0.5) * 5,
-    bp: 120 + Math.sin(i / 4) * 8 + (Math.random() - 0.5) * 4,
-    temp: 98.6 + (Math.random() - 0.5) * 0.4,
-    oxygen: 98 - Math.abs(Math.sin(i / 5)) * 2,
-  }));
+  // Format vitals for chart (last 24 hours, grouped by hour)
+  const chartData = vitalsData.length > 0
+    ? vitalsData.map(v => ({
+        hour: new Date(v.created_at).toLocaleTimeString('en-US', { hour: 'numeric' }),
+        heartRate: v.heart_rate,
+        bp: v.blood_pressure_systolic,
+        temp: v.temperature,
+        oxygen: v.oxygen_saturation,
+      }))
+    : [];
 
-  const currentVitals = {
-    heartRate: Math.round(vitalsData[vitalsData.length - 1].heartRate),
-    bloodPressure: `${Math.round(vitalsData[vitalsData.length - 1].bp)}/80`,
-    temperature: vitalsData[vitalsData.length - 1].temp.toFixed(1),
-    oxygen: Math.round(vitalsData[vitalsData.length - 1].oxygen),
-  };
+  // Calculate approximate age from created_at
+  const age = patient?.created_at
+    ? Math.floor((Date.now() - new Date(patient.created_at).getTime()) / (1000 * 60 * 60 * 24 * 365))
+    : null;
 
   const handleSaveNotes = () => {
     toast({
@@ -61,6 +161,39 @@ const PatientDetail = () => {
     critical: "destructive",
   } as const;
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-muted flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!patient) {
+    return (
+      <div className="min-h-screen bg-muted flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>Patient Not Found</CardTitle>
+            <CardDescription>This patient does not exist in the database.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => navigate("/dashboard")} className="w-full">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Dashboard
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const statusColors = {
+    normal: "success",
+    warning: "default",
+    critical: "destructive",
+  } as const;
+
   return (
     <div className="min-h-screen bg-muted">
       {/* Header */}
@@ -76,13 +209,13 @@ const PatientDetail = () => {
           </Button>
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-3xl font-bold">{patient.name}</h1>
+              <h1 className="text-3xl font-bold">{patient.full_name || 'Unknown Patient'}</h1>
               <p className="text-muted-foreground">
-                {patient.age} years • {patient.condition}
+                {age ? `${age} years` : 'Age not available'} • {patient.email}
               </p>
             </div>
-            <Badge variant={statusColors[patient.status as keyof typeof statusColors]}>
-              {patient.status}
+            <Badge variant={statusColors[status]}>
+              {status}
             </Badge>
           </div>
         </div>
@@ -99,28 +232,36 @@ const PatientDetail = () => {
                 <CardDescription>Real-time measurements</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="flex flex-col items-center p-4 rounded-lg bg-muted">
-                    <Heart className="h-8 w-8 text-destructive mb-2" />
-                    <p className="text-2xl font-bold">{currentVitals.heartRate}</p>
-                    <p className="text-xs text-muted-foreground">bpm</p>
+                {vitalsData.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Activity className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">No vitals data available</p>
+                    <p className="text-xs mt-1">Vitals will appear here once recorded</p>
                   </div>
-                  <div className="flex flex-col items-center p-4 rounded-lg bg-muted">
-                    <Activity className="h-8 w-8 text-primary mb-2" />
-                    <p className="text-2xl font-bold">{currentVitals.bloodPressure}</p>
-                    <p className="text-xs text-muted-foreground">mmHg</p>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="flex flex-col items-center p-4 rounded-lg bg-muted">
+                      <Heart className="h-8 w-8 text-destructive mb-2" />
+                      <p className="text-2xl font-bold">{currentVitals.heartRate ?? 'N/A'}</p>
+                      <p className="text-xs text-muted-foreground">bpm</p>
+                    </div>
+                    <div className="flex flex-col items-center p-4 rounded-lg bg-muted">
+                      <Activity className="h-8 w-8 text-primary mb-2" />
+                      <p className="text-2xl font-bold">{currentVitals.bloodPressure}</p>
+                      <p className="text-xs text-muted-foreground">mmHg</p>
+                    </div>
+                    <div className="flex flex-col items-center p-4 rounded-lg bg-muted">
+                      <Thermometer className="h-8 w-8 text-warning mb-2" />
+                      <p className="text-2xl font-bold">{currentVitals.temperature}</p>
+                      <p className="text-xs text-muted-foreground">°F</p>
+                    </div>
+                    <div className="flex flex-col items-center p-4 rounded-lg bg-muted">
+                      <Droplet className="h-8 w-8 text-secondary mb-2" />
+                      <p className="text-2xl font-bold">{currentVitals.oxygen ?? 'N/A'}</p>
+                      <p className="text-xs text-muted-foreground">%</p>
+                    </div>
                   </div>
-                  <div className="flex flex-col items-center p-4 rounded-lg bg-muted">
-                    <Thermometer className="h-8 w-8 text-warning mb-2" />
-                    <p className="text-2xl font-bold">{currentVitals.temperature}</p>
-                    <p className="text-xs text-muted-foreground">°F</p>
-                  </div>
-                  <div className="flex flex-col items-center p-4 rounded-lg bg-muted">
-                    <Droplet className="h-8 w-8 text-secondary mb-2" />
-                    <p className="text-2xl font-bold">{currentVitals.oxygen}</p>
-                    <p className="text-xs text-muted-foreground">%</p>
-                  </div>
-                </div>
+                )}
               </CardContent>
             </Card>
 
@@ -131,49 +272,60 @@ const PatientDetail = () => {
                 <CardDescription>Continuous monitoring data</CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={vitalsData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis
-                      dataKey="hour"
-                      tick={{ fill: "hsl(var(--muted-foreground))" }}
-                      stroke="hsl(var(--border))"
-                    />
-                    <YAxis
-                      tick={{ fill: "hsl(var(--muted-foreground))" }}
-                      stroke="hsl(var(--border))"
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "hsl(var(--card))",
-                        border: "1px solid hsl(var(--border))",
-                        borderRadius: "0.5rem",
-                      }}
-                    />
-                    <Legend />
-                    <Line
-                      type="monotone"
-                      dataKey="heartRate"
-                      stroke="hsl(var(--destructive))"
-                      strokeWidth={2}
-                      name="Heart Rate"
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="bp"
-                      stroke="hsl(var(--primary))"
-                      strokeWidth={2}
-                      name="Blood Pressure"
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="oxygen"
-                      stroke="hsl(var(--secondary))"
-                      strokeWidth={2}
-                      name="SpO2"
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+                {chartData.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Activity className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">No 24-hour trend data available</p>
+                    <p className="text-xs mt-1">Chart will display once vitals are recorded</p>
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis
+                        dataKey="hour"
+                        tick={{ fill: "hsl(var(--muted-foreground))" }}
+                        stroke="hsl(var(--border))"
+                      />
+                      <YAxis
+                        tick={{ fill: "hsl(var(--muted-foreground))" }}
+                        stroke="hsl(var(--border))"
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "hsl(var(--card))",
+                          border: "1px solid hsl(var(--border))",
+                          borderRadius: "0.5rem",
+                        }}
+                      />
+                      <Legend />
+                      <Line
+                        type="monotone"
+                        dataKey="heartRate"
+                        stroke="hsl(var(--destructive))"
+                        strokeWidth={2}
+                        name="Heart Rate"
+                        connectNulls
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="bp"
+                        stroke="hsl(var(--primary))"
+                        strokeWidth={2}
+                        name="Blood Pressure"
+                        connectNulls
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="oxygen"
+                        stroke="hsl(var(--secondary))"
+                        strokeWidth={2}
+                        name="SpO2"
+                        connectNulls
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                )}
               </CardContent>
             </Card>
           </div>

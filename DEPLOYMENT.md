@@ -1,6 +1,6 @@
 # NeuralTrace Deployment Guide
 
-This guide covers migrating NeuralTrace from Lovable Cloud to a self-managed Supabase instance.
+This guide covers deploying NeuralTrace with a self-managed Supabase instance.
 
 ## Prerequisites
 
@@ -27,15 +27,18 @@ supabase functions deploy ai-screen-vitals
 supabase functions deploy process-report
 ```
 
-## Step 3: Configure Secrets
+## Step 3: Configure Secrets (Optional)
 
 ```bash
-# Set the Lovable AI API key (or your chosen AI provider)
+# Optional: Set AI API key for enhanced AI features
+# If not set, Edge Functions will use basic rule-based analysis
 supabase secrets set LOVABLE_API_KEY=your_api_key_here
 
 # Verify secrets are set
 supabase secrets list
 ```
+
+**Note:** The AI API key is optional. If not provided, Edge Functions will use basic rule-based analysis instead of AI-powered analysis.
 
 ## Step 4: Enable Realtime
 

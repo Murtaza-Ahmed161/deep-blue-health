@@ -1,10 +1,10 @@
-import { useState, useEffect, useMemo, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Brain, Activity, Bell, LogOut, Users, TrendingUp, AlertCircle, Menu, Info, HelpCircle } from "lucide-react";
+import { Brain, Activity, Bell, LogOut, Users, TrendingUp, AlertCircle, Menu, Info, HelpCircle, Inbox } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -12,132 +12,138 @@ import PatientCard from "@/components/dashboard/PatientCard";
 import VitalsChart from "@/components/dashboard/VitalsChart";
 import AIInsights from "@/components/dashboard/AIInsights";
 import EmergencyAlert from "@/components/dashboard/EmergencyAlert";
-import { useVitalsStream } from "@/hooks/useVitalsStream";
 import FeedbackButton from "@/components/feedback/FeedbackButton";
 import { useSessionTracking } from "@/hooks/useSessionTracking";
+import { useAuth } from "@/hooks/useAuth";
 import { SkeletonCard, SkeletonChart } from "@/components/ui/skeleton-card";
+import { useDoctorPatients } from "@/hooks/useDoctorPatients";
+import { useDoctorAlerts } from "@/hooks/useDoctorAlerts";
 
 const DoctorDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, profile, signOut, role, loading: authLoading } = useAuth();
   const [emergencyAlert, setEmergencyAlert] = useState<{ patient: string; message: string } | null>(null);
-  const [acknowledgedAlerts, setAcknowledgedAlerts] = useState<Set<string>>(new Set());
+  const [profileError, setProfileError] = useState<string | null>(null);
+  
+  // CRITICAL: Guard clause - block access without valid profile
+  useEffect(() => {
+    if (!authLoading) {
+      if (!user) {
+        navigate('/auth');
+        return;
+      }
+      if (!profile) {
+        setProfileError('User profile missing — DB sync failed. Please contact support.');
+        console.error('CRITICAL: Doctor dashboard accessed without profile', { userId: user.id });
+        return;
+      }
+      if (role !== 'doctor') {
+        console.error('CRITICAL: Non-doctor accessed doctor dashboard', { userId: user.id, role });
+        navigate('/');
+        return;
+      }
+      setProfileError(null);
+    }
+  }, [user, profile, role, authLoading, navigate]);
+  
+  // Fetch real data from database
+  const { patients, loading: patientsLoading } = useDoctorPatients();
+  const { alerts, loading: alertsLoading, acknowledgeAlert } = useDoctorAlerts();
   
   // Track user session
   useSessionTracking();
 
-  const patients = [
-    {
-      id: 1,
-      name: "Sarah Johnson",
-      age: 68,
-      condition: "Hypertension",
-      status: "normal" as const,
-      lastReading: "2 hours ago",
-      vitals: {
-        heartRate: 72,
-        bloodPressure: "120/80",
-        temperature: 98.6,
-        oxygen: 98,
-      }
-    },
-    {
-      id: 2,
-      name: "Robert Chen",
-      age: 75,
-      condition: "Diabetes Type 2",
-      status: "warning" as const,
-      lastReading: "15 min ago",
-      vitals: {
-        heartRate: 88,
-        bloodPressure: "145/92",
-        temperature: 99.1,
-        oxygen: 96,
-      }
-    },
-    {
-      id: 3,
-      name: "Maria Garcia",
-      age: 62,
-      condition: "Post-Surgery",
-      status: "critical" as const,
-      lastReading: "Just now",
-      vitals: {
-        heartRate: 105,
-        bloodPressure: "160/95",
-        temperature: 100.4,
-        oxygen: 93,
-      }
-    },
-  ];
-
-  // Real-time vitals streaming
-  const { vitalsData, alerts: streamAlerts } = useVitalsStream(patients);
-
-  // Generate AI insights based on vitals - memoized to prevent recalculation
-  const aiInsights = useMemo(() => 
-    Array.from(vitalsData.values()).flatMap((patientVitals) => {
-      const patient = patients.find(p => p.id === patientVitals.patientId);
-      if (!patient) return [];
-
-      const latest = patientVitals.readings[patientVitals.readings.length - 1];
-      const insights = [];
-
-      if (latest.heartRate > 100) {
-        insights.push({
-          id: `${patient.id}-hr-trend`,
-          type: 'trend' as const,
-          message: `${patient.name}: Heart rate elevated (${latest.heartRate} bpm) - possible stress episode`,
-          severity: latest.heartRate > 120 ? 'critical' as const : 'warning' as const,
-          timestamp: '2 min ago',
-        });
-      }
-
-      if (latest.bloodPressure.systolic > 140) {
-        insights.push({
-          id: `${patient.id}-bp-anomaly`,
-          type: 'anomaly' as const,
-          message: `${patient.name}: Blood pressure spike detected (${latest.bloodPressure.systolic}/${latest.bloodPressure.diastolic})`,
-          severity: latest.bloodPressure.systolic > 160 ? 'critical' as const : 'warning' as const,
-          timestamp: 'Just now',
-        });
-      }
-
-      return insights;
-    }).slice(0, 5)
-  , [vitalsData, patients]);
+  // Clear all state on logout or role change
+  useEffect(() => {
+    if (!user || role !== 'doctor') {
+      setEmergencyAlert(null);
+    }
+  }, [user, role]);
 
   // Trigger emergency alert for critical conditions
   useEffect(() => {
-    const criticalAlerts = streamAlerts.filter(a => a.severity === 'critical' && !acknowledgedAlerts.has(a.id));
+    const criticalAlerts = alerts.filter(a => a.severity === 'critical' && !a.acknowledged);
     if (criticalAlerts.length > 0 && !emergencyAlert) {
       setEmergencyAlert({
-        patient: criticalAlerts[0].patient,
+        patient: criticalAlerts[0].patientName,
         message: criticalAlerts[0].message,
       });
     }
-  }, [streamAlerts, acknowledgedAlerts, emergencyAlert]);
+  }, [alerts, emergencyAlert]);
 
-  // Update patient vitals with real-time data - memoized
-  const updatedPatients = useMemo(() =>
-    patients.map(patient => {
-      const vitals = vitalsData.get(patient.id);
-      if (!vitals) return patient;
+  // Get AI insights from database (ai_screening_results)
+  const aiInsights = alerts
+    .filter(a => !a.acknowledged)
+    .slice(0, 5)
+    .map(alert => ({
+      id: alert.id,
+      type: alert.severity === 'critical' ? 'anomaly' as const : 'trend' as const,
+      message: `${alert.patientName}: ${alert.message}`,
+      severity: alert.severity,
+      timestamp: alert.time,
+    }));
 
-      const latest = vitals.readings[vitals.readings.length - 1];
-      return {
-        ...patient,
-        status: vitals.status,
-        lastReading: 'Just now',
-        vitals: {
-          heartRate: latest.heartRate,
-          bloodPressure: `${latest.bloodPressure.systolic}/${latest.bloodPressure.diastolic}`,
-          temperature: latest.temperature,
-          oxygen: latest.oxygen,
-        },
-      };
-    })
-  , [vitalsData, patients]);
+  const handleLogout = async () => {
+    // Clear all state before logout
+    setEmergencyAlert(null);
+    await signOut();
+    navigate("/");
+  };
+
+  const handleAcknowledgeAlert = async (alertId: string, patientName: string) => {
+    await acknowledgeAlert(alertId);
+    toast({
+      title: "Alert Reviewed",
+      description: `${patientName}'s alert has been marked as reviewed.`,
+    });
+  };
+
+  // Calculate stats from real data
+  const totalPatients = patients.length;
+  const activePatients = patients.filter(p => p.status !== 'normal').length;
+  const totalAlerts = alerts.filter(a => !a.acknowledged).length;
+  const criticalAlertsCount = alerts.filter(a => a.severity === 'critical' && !a.acknowledged).length;
+
+  // Show error state if profile is missing
+  if (profileError) {
+    return (
+      <div className="min-h-screen bg-muted flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-destructive">Profile Missing</CardTitle>
+            <CardDescription>{profileError}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => navigate('/auth')} className="w-full">
+              Return to Login
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Show loading state
+  if (authLoading || patientsLoading || alertsLoading) {
+    return (
+      <div className="min-h-screen bg-muted">
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            {[1, 2, 3, 4].map(i => (
+              <SkeletonCard key={i} />
+            ))}
+          </div>
+          <SkeletonCard />
+        </div>
+      </div>
+    );
+  }
+
+  // Final guard - should never reach here without profile, but double-check
+  if (!profile || role !== 'doctor') {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-muted">
@@ -164,16 +170,18 @@ const DoctorDashboard = () => {
               </Button>
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="h-5 w-5" />
-                <span className="absolute top-0 right-0 h-2 w-2 bg-destructive rounded-full" />
+                {criticalAlertsCount > 0 && (
+                  <span className="absolute top-0 right-0 h-2 w-2 bg-destructive rounded-full" />
+                )}
               </Button>
               <div className="text-right">
-                <p className="text-sm font-medium">Dr. John Smith</p>
-                <p className="text-xs text-muted-foreground">Cardiology</p>
+                <p className="text-sm font-medium">{profile?.full_name || 'Doctor'}</p>
+                <p className="text-xs text-muted-foreground">{profile?.specialty || 'Medical Professional'}</p>
               </div>
               <Button 
                 variant="ghost" 
                 size="icon"
-                onClick={() => navigate('/')}
+                onClick={handleLogout}
               >
                 <LogOut className="h-5 w-5" />
               </Button>
@@ -184,15 +192,17 @@ const DoctorDashboard = () => {
               <SheetTrigger asChild className="md:hidden">
                 <Button variant="ghost" size="icon" className="relative">
                   <Menu className="h-5 w-5" />
-                  <span className="absolute top-1 right-1 h-2 w-2 bg-destructive rounded-full" />
+                  {criticalAlertsCount > 0 && (
+                    <span className="absolute top-1 right-1 h-2 w-2 bg-destructive rounded-full" />
+                  )}
                 </Button>
               </SheetTrigger>
               <SheetContent>
                 <div className="flex flex-col gap-4 mt-8">
                   <div className="flex items-center justify-between p-4 rounded-lg bg-muted">
                     <div>
-                      <p className="font-medium">Dr. John Smith</p>
-                      <p className="text-sm text-muted-foreground">Cardiology</p>
+                      <p className="font-medium">{profile?.full_name || 'Doctor'}</p>
+                      <p className="text-sm text-muted-foreground">{profile?.specialty || 'Medical Professional'}</p>
                     </div>
                     <ThemeToggle />
                   </div>
@@ -208,9 +218,11 @@ const DoctorDashboard = () => {
                   <Button variant="outline" className="w-full justify-start relative">
                     <Bell className="mr-2 h-4 w-4" />
                     Notifications
-                    <span className="absolute top-2 right-2 h-2 w-2 bg-destructive rounded-full" />
+                    {criticalAlertsCount > 0 && (
+                      <span className="absolute top-2 right-2 h-2 w-2 bg-destructive rounded-full" />
+                    )}
                   </Button>
-                  <Button variant="ghost" onClick={() => navigate('/')} className="w-full justify-start">
+                  <Button variant="ghost" onClick={handleLogout} className="w-full justify-start">
                     <LogOut className="mr-2 h-4 w-4" />
                     Logout
                   </Button>
@@ -229,7 +241,7 @@ const DoctorDashboard = () => {
               <div className="flex flex-col md:flex-row items-start md:items-center md:justify-between gap-2">
                 <div>
                   <p className="text-xs md:text-sm text-muted-foreground">Total Patients</p>
-                  <p className="text-2xl md:text-3xl font-bold text-foreground">24</p>
+                  <p className="text-2xl md:text-3xl font-bold text-foreground">{totalPatients}</p>
                 </div>
                 <Users className="h-6 md:h-8 w-6 md:w-8 text-primary" />
               </div>
@@ -241,7 +253,7 @@ const DoctorDashboard = () => {
               <div className="flex flex-col md:flex-row items-start md:items-center md:justify-between gap-2">
                 <div>
                   <p className="text-xs md:text-sm text-muted-foreground">Active</p>
-                  <p className="text-2xl md:text-3xl font-bold text-foreground">18</p>
+                  <p className="text-2xl md:text-3xl font-bold text-foreground">{activePatients}</p>
                 </div>
                 <Activity className="h-6 md:h-8 w-6 md:w-8 text-success" />
               </div>
@@ -253,7 +265,7 @@ const DoctorDashboard = () => {
               <div className="flex flex-col md:flex-row items-start md:items-center md:justify-between gap-2">
                 <div>
                   <p className="text-xs md:text-sm text-muted-foreground">Alerts</p>
-                  <p className="text-2xl md:text-3xl font-bold text-foreground">7</p>
+                  <p className="text-2xl md:text-3xl font-bold text-foreground">{totalAlerts}</p>
                 </div>
                 <AlertCircle className="h-6 md:h-8 w-6 md:w-8 text-warning" />
               </div>
@@ -264,8 +276,8 @@ const DoctorDashboard = () => {
             <CardContent className="pt-4 md:pt-6 px-3 md:px-6">
               <div className="flex flex-col md:flex-row items-start md:items-center md:justify-between gap-2">
                 <div>
-                  <p className="text-xs md:text-sm text-muted-foreground">Response</p>
-                  <p className="text-2xl md:text-3xl font-bold text-foreground">1.2m</p>
+                  <p className="text-xs md:text-sm text-muted-foreground">Critical</p>
+                  <p className="text-2xl md:text-3xl font-bold text-foreground">{criticalAlertsCount}</p>
                 </div>
                 <TrendingUp className="h-6 md:h-8 w-6 md:w-8 text-secondary" />
               </div>
@@ -287,41 +299,41 @@ const DoctorDashboard = () => {
                 <CardDescription>Patients requiring immediate attention</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {streamAlerts.slice(0, 5).map((alert) => (
-                  <div 
-                    key={alert.id} 
-                    className="flex items-center justify-between p-4 rounded-lg border border-border bg-background"
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="font-medium">{alert.patient}</p>
-                        <Badge variant={alert.severity === 'critical' ? 'destructive' : 'default'}>
-                          {alert.severity}
-                        </Badge>
-                        {acknowledgedAlerts.has(alert.id) && (
-                          <Badge variant="success" className="text-xs">
-                            Acknowledged
-                          </Badge>
-                        )}
-                      </div>
-                      <p className="text-sm text-muted-foreground">{alert.message}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{alert.time}</p>
-                    </div>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => {
-                        setAcknowledgedAlerts(prev => new Set(prev).add(alert.id));
-                        toast({
-                          title: "Alert Reviewed",
-                          description: `${alert.patient}'s alert has been marked as reviewed.`,
-                        });
-                      }}
-                    >
-                      Mark Reviewed
-                    </Button>
+                {alerts.filter(a => !a.acknowledged).length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Inbox className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">No alerts</p>
+                    <p className="text-xs mt-1">All patients are stable</p>
                   </div>
-                ))}
+                ) : (
+                  alerts
+                    .filter(a => !a.acknowledged)
+                    .slice(0, 5)
+                    .map((alert) => (
+                      <div 
+                        key={alert.id} 
+                        className="flex items-center justify-between p-4 rounded-lg border border-border bg-background"
+                      >
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className="font-medium">{alert.patientName}</p>
+                            <Badge variant={alert.severity === 'critical' ? 'destructive' : 'default'}>
+                              {alert.severity}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">{alert.message}</p>
+                          <p className="text-xs text-muted-foreground mt-1">{alert.time}</p>
+                        </div>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleAcknowledgeAlert(alert.id, alert.patientName)}
+                        >
+                          Mark Reviewed
+                        </Button>
+                      </div>
+                    ))
+                )}
               </CardContent>
             </Card>
 
@@ -332,13 +344,29 @@ const DoctorDashboard = () => {
                 <CardDescription>Real-time monitoring status</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {updatedPatients.map((patient) => (
-                  <PatientCard 
-                    key={patient.id} 
-                    patient={patient}
-                    onClick={() => navigate(`/patient/${patient.id}`)}
-                  />
-                ))}
+                {patients.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Users className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">No patients assigned</p>
+                    <p className="text-xs mt-1">Patients will appear here once assigned to you</p>
+                  </div>
+                ) : (
+                  patients.map((patient) => (
+                    <PatientCard 
+                      key={patient.id} 
+                      patient={{
+                        id: Number(patient.id.slice(0, 8).replace(/-/g, ''), 16) % 1000000, // Convert UUID to number for PatientCard
+                        name: patient.name,
+                        age: patient.age || 0,
+                        condition: patient.condition || '',
+                        status: patient.status,
+                        lastReading: patient.lastReading,
+                        vitals: patient.vitals,
+                      }}
+                      onClick={() => navigate(`/patient/${patient.id}`)}
+                    />
+                  ))
+                )}
               </CardContent>
             </Card>
           </div>
@@ -405,42 +433,41 @@ const DoctorDashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {streamAlerts.slice(0, 5).map((alert) => (
-                  <div 
-                    key={alert.id} 
-                    className="p-4 rounded-lg border border-border bg-background touch-target space-y-3"
-                  >
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2 mb-2">
-                        <p className="font-medium">{alert.patient}</p>
-                        <Badge variant={alert.severity === 'critical' ? 'destructive' : 'default'}>
-                          {alert.severity}
-                        </Badge>
-                        {acknowledgedAlerts.has(alert.id) && (
-                          <Badge variant="success" className="text-xs">
-                            Acknowledged
-                          </Badge>
-                        )}
-                      </div>
-                      <p className="text-sm text-muted-foreground">{alert.message}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{alert.time}</p>
-                    </div>
-                    <Button 
-                      variant="outline" 
-                      size="default"
-                      className="w-full touch-target"
-                      onClick={() => {
-                        setAcknowledgedAlerts(prev => new Set(prev).add(alert.id));
-                        toast({
-                          title: "Alert Reviewed",
-                          description: `${alert.patient}'s alert has been marked as reviewed.`,
-                        });
-                      }}
-                    >
-                      Mark Reviewed
-                    </Button>
+                {alerts.filter(a => !a.acknowledged).length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Inbox className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">No alerts</p>
                   </div>
-                ))}
+                ) : (
+                  alerts
+                    .filter(a => !a.acknowledged)
+                    .slice(0, 5)
+                    .map((alert) => (
+                      <div 
+                        key={alert.id} 
+                        className="p-4 rounded-lg border border-border bg-background touch-target space-y-3"
+                      >
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2 mb-2">
+                            <p className="font-medium">{alert.patientName}</p>
+                            <Badge variant={alert.severity === 'critical' ? 'destructive' : 'default'}>
+                              {alert.severity}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">{alert.message}</p>
+                          <p className="text-xs text-muted-foreground mt-1">{alert.time}</p>
+                        </div>
+                        <Button 
+                          variant="outline" 
+                          size="default"
+                          className="w-full touch-target"
+                          onClick={() => handleAcknowledgeAlert(alert.id, alert.patientName)}
+                        >
+                          Mark Reviewed
+                        </Button>
+                      </div>
+                    ))
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -452,14 +479,29 @@ const DoctorDashboard = () => {
                 <CardDescription className="text-xs">Real-time monitoring</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3 touch-pan-y overflow-y-auto max-h-[calc(100vh-300px)]">
-                {updatedPatients.map((patient) => (
-                  <div key={patient.id} className="touch-target">
-                    <PatientCard 
-                      patient={patient}
-                      onClick={() => navigate(`/patient/${patient.id}`)}
-                    />
+                {patients.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Users className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">No patients assigned</p>
                   </div>
-                ))}
+                ) : (
+                  patients.map((patient) => (
+                    <div key={patient.id} className="touch-target">
+                      <PatientCard 
+                        patient={{
+                          id: Number(patient.id.slice(0, 8).replace(/-/g, ''), 16) % 1000000,
+                          name: patient.name,
+                          age: patient.age || 0,
+                          condition: patient.condition || '',
+                          status: patient.status,
+                          lastReading: patient.lastReading,
+                          vitals: patient.vitals,
+                        }}
+                        onClick={() => navigate(`/patient/${patient.id}`)}
+                      />
+                    </div>
+                  ))
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -519,9 +561,9 @@ const DoctorDashboard = () => {
       <EmergencyAlert
         open={!!emergencyAlert}
         onClose={() => {
-          const criticalAlert = streamAlerts.find(a => a.severity === 'critical' && a.patient === emergencyAlert?.patient);
+          const criticalAlert = alerts.find(a => a.severity === 'critical' && a.patientName === emergencyAlert?.patient);
           if (criticalAlert) {
-            setAcknowledgedAlerts(prev => new Set(prev).add(criticalAlert.id));
+            handleAcknowledgeAlert(criticalAlert.id, criticalAlert.patientName);
           }
           setEmergencyAlert(null);
         }}

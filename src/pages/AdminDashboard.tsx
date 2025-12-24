@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { SkeletonCard } from "@/components/ui/skeleton-card";
 import { Brain, LogOut, Users, Activity, MessageSquare, TrendingUp, AlertCircle, Clock, RefreshCw, Info, HelpCircle } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,9 +19,31 @@ import { BetaInviteManager } from "@/components/admin/BetaInviteManager";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, signOut, role, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
+
+  // CRITICAL: Guard clause - block access without valid profile
+  useEffect(() => {
+    if (!authLoading) {
+      if (!user) {
+        navigate('/auth');
+        return;
+      }
+      if (!profile) {
+        setProfileError('User profile missing — DB sync failed. Please contact support.');
+        console.error('CRITICAL: Admin dashboard accessed without profile', { userId: user.id });
+        return;
+      }
+      if (role !== 'admin') {
+        console.error('CRITICAL: Non-admin accessed admin dashboard', { userId: user.id, role });
+        navigate('/');
+        return;
+      }
+      setProfileError(null);
+    }
+  }, [user, profile, role, authLoading, navigate]);
   
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -37,13 +61,12 @@ const AdminDashboard = () => {
   const [healthMetrics, setHealthMetrics] = useState<any[]>([]);
 
   useEffect(() => {
-    if (!user) {
-      navigate("/auth");
-      return;
+    if (!user || !profile || role !== 'admin') {
+      return; // Guard clause will handle navigation
     }
 
     fetchDashboardData();
-  }, [user, navigate]);
+  }, [user, profile, role, navigate]);
 
   const fetchDashboardData = async () => {
     setIsLoading(true);
@@ -130,19 +153,34 @@ const AdminDashboard = () => {
       }
       setActivityData(last7Days);
 
-      // Generate alerts timeline data
+      // Fetch real alerts timeline data from Supabase
       const alertsTimeline = [];
       for (let i = 6; i >= 0; i--) {
         const date = new Date();
         date.setDate(date.getDate() - i);
         const dateStr = date.toLocaleDateString("en-US", { weekday: "short" });
         
-        // Mock data for now - would need actual alert severity tracking
+        // Get alerts for this date from ai_screening_results
+        const dayStart = new Date(date);
+        dayStart.setHours(0, 0, 0, 0);
+        const dayEnd = new Date(date);
+        dayEnd.setHours(23, 59, 59, 999);
+        
+        const { data: dayAlerts } = await supabase
+          .from('ai_screening_results')
+          .select('severity')
+          .gte('created_at', dayStart.toISOString())
+          .lte('created_at', dayEnd.toISOString());
+        
+        const critical = (dayAlerts || []).filter(a => a.severity === 'critical').length;
+        const warning = (dayAlerts || []).filter(a => a.severity === 'warning').length;
+        const info = (dayAlerts || []).filter(a => a.severity === 'normal').length;
+        
         alertsTimeline.push({
           date: dateStr,
-          critical: Math.floor(Math.random() * 3),
-          warning: Math.floor(Math.random() * 5),
-          info: Math.floor(Math.random() * 8),
+          critical,
+          warning,
+          info,
         });
       }
       setAlertsData(alertsTimeline);
@@ -214,6 +252,41 @@ const AdminDashboard = () => {
     const hours = Math.floor(minutes / 60);
     return `${hours}h ${minutes % 60}m`;
   };
+
+  // Show error state if profile is missing
+  if (profileError) {
+    return (
+      <div className="min-h-screen bg-muted flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-destructive">Profile Missing</CardTitle>
+            <CardDescription>{profileError}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => navigate('/auth')} className="w-full">
+              Return to Login
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Show loading state
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-muted">
+        <div className="container mx-auto px-4 py-8">
+          <SkeletonCard />
+        </div>
+      </div>
+    );
+  }
+
+  // Final guard - should never reach here without profile, but double-check
+  if (!profile || role !== 'admin') {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-muted">

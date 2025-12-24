@@ -157,6 +157,88 @@ const Auth = () => {
 
       if (error) throw error;
 
+      // CRITICAL: Profile and role creation MUST succeed
+      // If they fail, the signup is incomplete and we must abort
+      if (!data.user) {
+        throw new Error('User creation failed - no user returned from Supabase');
+      }
+
+      // Wait a moment for trigger to potentially fire
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Check if profile exists
+      const { data: existingProfile, error: profileCheckError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', data.user.id)
+        .single();
+
+      if (profileCheckError && profileCheckError.code !== 'PGRST116') {
+        // PGRST116 is "not found" which is expected if trigger didn't fire
+        // Any other error is a real problem
+        console.error('CRITICAL: Failed to check profile existence:', profileCheckError);
+        throw new Error(`Profile check failed: ${profileCheckError.message}`);
+      }
+
+      if (!existingProfile) {
+        console.warn('Profile not created by trigger, creating manually...');
+        
+        // Create profile explicitly - FAIL LOUDLY if this fails
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: data.user.id,
+            email: data.user.email!,
+            full_name: fullName,
+            phone: phone || null,
+            specialty: userType === 'doctor' ? specialty : null,
+            license_number: userType === 'doctor' ? licenseNumber : null,
+          });
+
+        if (profileError) {
+          console.error('CRITICAL: Profile creation failed:', profileError);
+          // Sign out the user since profile creation failed
+          // The auth user will remain but cannot be used without a profile
+          await supabase.auth.signOut();
+          throw new Error(`Profile creation failed: ${profileError.message}. Account creation aborted. Please try again or contact support.`);
+        }
+      }
+
+      // Check if role exists
+      const { data: existingRole, error: roleCheckError } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', data.user.id)
+        .single();
+
+      if (roleCheckError && roleCheckError.code !== 'PGRST116') {
+        // PGRST116 is "not found" which is expected if trigger didn't fire
+        console.error('CRITICAL: Failed to check role existence:', roleCheckError);
+        throw new Error(`Role check failed: ${roleCheckError.message}`);
+      }
+
+      if (!existingRole) {
+        console.warn('Role not created by trigger, creating manually...');
+        
+        // Create role explicitly - FAIL LOUDLY if this fails
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .insert({
+            user_id: data.user.id,
+            role: userType,
+          });
+
+        if (roleError) {
+          console.error('CRITICAL: Role creation failed:', roleError);
+          // Sign out the user since role creation failed
+          // The auth user and profile will remain but cannot be used without a role
+          await supabase.auth.signOut();
+          throw new Error(`Role creation failed: ${roleError.message}. Account creation aborted. Please try again or contact support.`);
+        }
+      }
+
+      console.log('Profile and role verified/created successfully in Supabase');
+
       toast({
         title: "Account created successfully",
         description: `Welcome to NeuralTrace! You can now log in as a ${userType}.`,
