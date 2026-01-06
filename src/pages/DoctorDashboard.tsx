@@ -18,6 +18,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { SkeletonCard, SkeletonChart } from "@/components/ui/skeleton-card";
 import { useDoctorPatients } from "@/hooks/useDoctorPatients";
 import { useDoctorAlerts } from "@/hooks/useDoctorAlerts";
+import AssignPatientDialog from "@/components/doctor/AssignPatientDialog";
 
 const DoctorDashboard = () => {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ const DoctorDashboard = () => {
   const { user, profile, signOut, role, loading: authLoading } = useAuth();
   const [emergencyAlert, setEmergencyAlert] = useState<{ patient: string; message: string } | null>(null);
   const [profileError, setProfileError] = useState<string | null>(null);
+  const [showAssignmentDialog, setShowAssignmentDialog] = useState(false);
   
   // CRITICAL: Guard clause - block access without valid profile
   useEffect(() => {
@@ -48,7 +50,7 @@ const DoctorDashboard = () => {
   }, [user, profile, role, authLoading, navigate]);
   
   // Fetch real data from database
-  const { patients, loading: patientsLoading } = useDoctorPatients();
+  const { patients, loading: patientsLoading, assignPatient, refreshPatients } = useDoctorPatients();
   const { alerts, loading: alertsLoading, acknowledgeAlert } = useDoctorAlerts();
   
   // Track user session
@@ -97,6 +99,23 @@ const DoctorDashboard = () => {
       title: "Alert Reviewed",
       description: `${patientName}'s alert has been marked as reviewed.`,
     });
+  };
+
+  const handleAssignPatient = async (patientId: string, notes?: string) => {
+    try {
+      await assignPatient(patientId, notes);
+      toast({
+        title: "Patient Assigned",
+        description: "Patient has been successfully assigned to your care.",
+      });
+    } catch (error) {
+      console.error('Error assigning patient:', error);
+      toast({
+        title: "Assignment Failed",
+        description: error instanceof Error ? error.message : "Failed to assign patient",
+        variant: "destructive"
+      });
+    }
   };
 
   // Calculate stats from real data
@@ -234,6 +253,27 @@ const DoctorDashboard = () => {
       </nav>
 
       <div className="container mx-auto px-3 md:px-4 py-4 md:py-8">
+        {/* Assignment Status Banner */}
+        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg dark:bg-green-950 dark:border-green-800">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium text-green-800 dark:text-green-200">Patient Assignment System Active</h3>
+              <p className="text-sm text-green-600 dark:text-green-300">
+                You are viewing patients assigned to your care. Use "Assign New Patient" to add patients.
+              </p>
+            </div>
+            <div className="flex gap-2 shrink-0">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowAssignmentDialog(true)}
+              >
+                <Users className="mr-2 h-4 w-4" />
+                Assign Patient
+              </Button>
+            </div>
+          </div>
+        </div>
         {/* Stats Overview - Responsive Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
           <Card className="touch-target">
@@ -340,15 +380,27 @@ const DoctorDashboard = () => {
             {/* Patients List */}
             <Card>
               <CardHeader>
-                <CardTitle>Patient Overview</CardTitle>
-                <CardDescription>Real-time monitoring status</CardDescription>
+                <CardTitle className="flex items-center justify-between">
+                  <span>Assigned Patients</span>
+                  <Badge variant="secondary">{patients.length} assigned</Badge>
+                </CardTitle>
+                <CardDescription>Patients under your direct care</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {patients.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <Users className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">No patients assigned</p>
-                    <p className="text-xs mt-1">Patients will appear here once assigned to you</p>
+                    <p className="text-sm">No patients assigned to you</p>
+                    <p className="text-xs mt-1">Click "Assign New Patient" to add patients to your care</p>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="mt-3"
+                      onClick={() => setShowAssignmentDialog(true)}
+                    >
+                      <Users className="mr-2 h-4 w-4" />
+                      Assign Patient
+                    </Button>
                   </div>
                 ) : (
                   patients.map((patient) => (
@@ -389,10 +441,10 @@ const DoctorDashboard = () => {
                 <Button 
                   className="w-full justify-start" 
                   variant="outline"
-                  onClick={() => toast({ title: "Feature Coming Soon", description: "Add new patient functionality will be available soon." })}
+                  onClick={() => setShowAssignmentDialog(true)}
                 >
                   <Users className="mr-2 h-4 w-4" />
-                  Add New Patient
+                  Assign New Patient
                 </Button>
                 <Button 
                   className="w-full justify-start" 
@@ -475,14 +527,26 @@ const DoctorDashboard = () => {
           <TabsContent value="patients" className="space-y-3 mt-0">
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Patient Overview</CardTitle>
-                <CardDescription className="text-xs">Real-time monitoring</CardDescription>
+                <CardTitle className="text-lg flex items-center justify-between">
+                  <span>Assigned Patients</span>
+                  <Badge variant="secondary" className="text-xs">{patients.length}</Badge>
+                </CardTitle>
+                <CardDescription className="text-xs">Patients under your care</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3 touch-pan-y overflow-y-auto max-h-[calc(100vh-300px)]">
                 {patients.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <Users className="h-12 w-12 mx-auto mb-2 opacity-50" />
                     <p className="text-sm">No patients assigned</p>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="mt-3"
+                      onClick={() => setShowAssignmentDialog(true)}
+                    >
+                      <Users className="mr-2 h-4 w-4" />
+                      Assign Patient
+                    </Button>
                   </div>
                 ) : (
                   patients.map((patient) => (
@@ -528,10 +592,10 @@ const DoctorDashboard = () => {
                   className="w-full justify-start touch-target" 
                   variant="outline"
                   size="lg"
-                  onClick={() => toast({ title: "Feature Coming Soon", description: "Add new patient functionality will be available soon." })}
+                  onClick={() => setShowAssignmentDialog(true)}
                 >
                   <Users className="mr-2 h-5 w-5" />
-                  Add New Patient
+                  Assign New Patient
                 </Button>
                 <Button 
                   className="w-full justify-start touch-target" 
@@ -556,6 +620,14 @@ const DoctorDashboard = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Assignment Dialog */}
+      <AssignPatientDialog
+        open={showAssignmentDialog}
+        onClose={() => setShowAssignmentDialog(false)}
+        onAssign={handleAssignPatient}
+        availablePatients={[]} // Will be fetched by the dialog component
+      />
 
       {/* Emergency Alert Modal */}
       <EmergencyAlert

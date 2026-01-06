@@ -166,6 +166,110 @@ export type Database = {
         }
         Relationships: []
       }
+      emergency_events: {
+        Row: {
+          created_at: string
+          id: string
+          location_consented: boolean
+          location_lat: number | null
+          location_lng: number | null
+          notes: string | null
+          patient_id: string
+          status: string
+          triggered_at: string
+          triggered_by: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          location_consented?: boolean
+          location_lat?: number | null
+          location_lng?: number | null
+          notes?: string | null
+          patient_id: string
+          status?: string
+          triggered_at?: string
+          triggered_by: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          location_consented?: boolean
+          location_lat?: number | null
+          location_lng?: number | null
+          notes?: string | null
+          patient_id?: string
+          status?: string
+          triggered_at?: string
+          triggered_by?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emergency_events_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emergency_events_triggered_by_fkey"
+            columns: ["triggered_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      emergency_notifications: {
+        Row: {
+          channel: string
+          created_at: string
+          error_message: string | null
+          event_id: string
+          id: string
+          message_id: string | null
+          recipient_address: string
+          recipient_type: string
+          sent_at: string | null
+          status: string
+        }
+        Insert: {
+          channel: string
+          created_at?: string
+          error_message?: string | null
+          event_id: string
+          id?: string
+          message_id?: string | null
+          recipient_address: string
+          recipient_type: string
+          sent_at?: string | null
+          status: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          error_message?: string | null
+          event_id?: string
+          id?: string
+          message_id?: string | null
+          recipient_address?: string
+          recipient_type?: string
+          sent_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emergency_notifications_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "emergency_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       feedback: {
         Row: {
           admin_notes: string | null

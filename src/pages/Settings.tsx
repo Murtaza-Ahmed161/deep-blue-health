@@ -6,13 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Save, User, Bell, Shield, FileCheck } from "lucide-react";
+import { ArrowLeft, Save, User, Bell, Shield, FileCheck, AlertTriangle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import NotificationSettings from "@/components/settings/NotificationSettings";
 import TwoFactorSetup from "@/components/settings/TwoFactorSetup";
 import { ConsentAuditTrail } from "@/components/settings/ConsentAuditTrail";
+import EmergencyContactSettings from "@/components/settings/EmergencyContactSettings";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -85,10 +86,14 @@ const Settings = () => {
 
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="profile">
               <User className="mr-2 h-4 w-4" />
               Profile
+            </TabsTrigger>
+            <TabsTrigger value="emergency">
+              <AlertTriangle className="mr-2 h-4 w-4" />
+              Emergency
             </TabsTrigger>
             <TabsTrigger value="notifications">
               <Bell className="mr-2 h-4 w-4" />
@@ -197,6 +202,10 @@ const Settings = () => {
               <Save className="mr-2 h-4 w-4" />
               {saving ? "Saving..." : "Save Profile Changes"}
             </Button>
+          </TabsContent>
+
+          <TabsContent value="emergency">
+            <EmergencyContactSettings />
           </TabsContent>
 
           <TabsContent value="notifications">

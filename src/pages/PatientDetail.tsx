@@ -188,12 +188,6 @@ const PatientDetail = () => {
     );
   }
 
-  const statusColors = {
-    normal: "success",
-    warning: "default",
-    critical: "destructive",
-  } as const;
-
   return (
     <div className="min-h-screen bg-muted">
       {/* Header */}

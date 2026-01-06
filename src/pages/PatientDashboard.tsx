@@ -22,6 +22,8 @@ import { useRetryLogic } from "@/hooks/useRetryLogic";
 import { useUptimeMonitoring } from "@/hooks/useUptimeMonitoring";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useVitals } from "@/hooks/useVitals";
+import EmergencyButton from "@/components/emergency/EmergencyButton";
+import CoreSystemTest from "@/components/debug/CoreSystemTest";
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
@@ -264,6 +266,22 @@ const PatientDashboard = () => {
               <ConsultationRequest />
             </div>
 
+            {/* Core System Test - Development Only */}
+            {process.env.NODE_ENV === 'development' && <CoreSystemTest />}
+
+            {/* Emergency Alert System */}
+            <Card className="border-destructive/20 bg-destructive/5">
+              <CardHeader>
+                <CardTitle className="text-destructive">Emergency Alert System</CardTitle>
+                <CardDescription>
+                  Immediately notify your emergency contact in case of a medical emergency
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex justify-center">
+                <EmergencyButton />
+              </CardContent>
+            </Card>
+
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -294,9 +312,10 @@ const PatientDashboard = () => {
 
           {/* Mobile Tabbed View */}
           <Tabs defaultValue="vitals" className="md:hidden">
-            <TabsList className="grid w-full grid-cols-3 mb-4">
+            <TabsList className="grid w-full grid-cols-4 mb-4">
               <TabsTrigger value="vitals" className="text-xs">Vitals</TabsTrigger>
               <TabsTrigger value="actions" className="text-xs">Actions</TabsTrigger>
+              <TabsTrigger value="emergency" className="text-xs">Emergency</TabsTrigger>
               <TabsTrigger value="profile" className="text-xs">Profile</TabsTrigger>
             </TabsList>
 
@@ -319,6 +338,20 @@ const PatientDashboard = () => {
             <TabsContent value="actions" className="space-y-4 mt-0">
               <ReportUpload />
               <ConsultationRequest />
+            </TabsContent>
+
+            <TabsContent value="emergency" className="space-y-4 mt-0">
+              <Card className="border-destructive/20 bg-destructive/5">
+                <CardHeader>
+                  <CardTitle className="text-destructive">Emergency Alert System</CardTitle>
+                  <CardDescription>
+                    Immediately notify your emergency contact in case of a medical emergency
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="flex justify-center">
+                  <EmergencyButton />
+                </CardContent>
+              </Card>
             </TabsContent>
 
             <TabsContent value="profile" className="space-y-4 mt-0">
