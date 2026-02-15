@@ -87,7 +87,6 @@ The core value: increase safety and independence through continuous non-invasive
 
 * Integration with telemedicine services for one-click clinician consult.
 * Advanced arrhythmia detection from ECG strips (where device exposes ECG data).
-* Multi-language voice assistant and TTS for daily briefings.
 * Offline/fallback detection (local device-level detection if connectivity lost).
 * AI + human doctor co-review dashboard with confidence scoring comparison.
 

@@ -186,19 +186,7 @@
     <div class="title-page">
         <h1>NeuralTrace</h1>
         <div class="subtitle">An AI-Powered Continuous Health Monitoring Platform<br>with Real-Time Vitals Tracking and Doctor Integration</div>
-        <div class="author-info">
-            <p><strong>Final Year Project</strong></p>
-            <p>Submitted in partial fulfillment of the requirements</p>
-            <p>for the degree of Bachelor of Science in Computer Science</p>
-            <br>
-            <p><strong>Author:</strong> [Student Name]</p>
-            <p><strong>Student ID:</strong> [Student ID]</p>
-            <p><strong>Supervisor:</strong> [Supervisor Name]</p>
-            <br>
-            <p><strong>Department of Computer Science</strong></p>
-            <p><strong>[University Name]</strong></p>
-            <p><strong>[Academic Year]</strong></p>
-        </div>
+
     </div>
 
     <!-- Abstract -->
@@ -211,7 +199,7 @@
             
             <p>When critical conditions are detected, the system automatically triggers a multi-tier emergency escalation protocol that can contact emergency services, notify designated caregivers via SMS and phone calls, and alert assigned healthcare providers. The platform also features comprehensive doctor integration, allowing licensed medical professionals to register, verify credentials, and provide virtual consultations with patients while accessing their complete health history and AI-generated insights.</p>
             
-            <p>Additional features include automated end-of-day clinical reports in PDF format, medical report ingestion with OCR and clinical NLP capabilities, a dedicated caregiver dashboard for family members, medication reminders, voice interaction capabilities, and a memory journal for patients with cognitive disorders. The system is built with security and privacy as foundational principles, implementing HIPAA-compliant data protection, role-based access control, two-factor authentication, comprehensive audit trails, and explicit consent management.</p>
+            <p>Additional features include automated end-of-day clinical reports in PDF format, medical report ingestion with OCR and clinical NLP capabilities, a dedicated caregiver dashboard for family members, medication reminders, and a memory journal for patients with cognitive disorders. The system is built with security and privacy as foundational principles, implementing HIPAA-compliant data protection, role-based access control, two-factor authentication, comprehensive audit trails, and explicit consent management.</p>
             
             <p>This project demonstrates the successful integration of modern web technologies (React, TypeScript, Supabase), AI/ML capabilities, wearable device APIs, and healthcare communication systems to create a scalable, secure, and user-friendly platform that enhances patient safety, improves healthcare accessibility, and reduces the burden on caregivers and healthcare providers.</p>
         </div>
@@ -258,35 +246,7 @@
         </ul>
     </div>
 
-    <!-- List of Figures -->
-    <div class="page-break">
-        <h2>List of Figures</h2>
-        <p>Figure 1: System Architecture Diagram</p>
-        <p>Figure 2: Database Entity Relationship Diagram</p>
-        <p>Figure 3: User Authentication Flow</p>
-        <p>Figure 4: Vitals Data Flow Diagram</p>
-        <p>Figure 5: AI Screening Process Flow</p>
-        <p>Figure 6: Emergency Escalation Workflow</p>
-        <p>Figure 7: Doctor-Patient Consultation Flow</p>
-        <p>Figure 8: Patient Dashboard Screenshot</p>
-        <p>Figure 9: Doctor Dashboard Screenshot</p>
-        <p>Figure 10: Admin Dashboard Screenshot</p>
-        <p>Figure 11: Mobile Application Interface</p>
-        <p>Figure 12: System Deployment Architecture</p>
-    </div>
 
-    <!-- List of Tables -->
-    <div>
-        <h2>List of Tables</h2>
-        <p>Table 1: Technology Stack Comparison</p>
-        <p>Table 2: Database Schema Overview</p>
-        <p>Table 3: User Roles and Permissions</p>
-        <p>Table 4: AI Screening Severity Levels</p>
-        <p>Table 5: Emergency Response Time SLAs</p>
-        <p>Table 6: Test Case Coverage Matrix</p>
-        <p>Table 7: Performance Benchmarks</p>
-        <p>Table 8: Security Compliance Checklist</p>
-    </div>
 
     <!-- Section 1: Introduction -->
     <div class="page-break">
@@ -332,7 +292,7 @@
         <p>While artificial intelligence shows tremendous promise in healthcare applications, practical integration into clinical workflows remains limited. Many AI-powered health applications operate in isolation, providing insights that are not easily accessible to healthcare providers or integrated into patient care plans. This disconnect prevents healthcare professionals from leveraging AI capabilities to enhance their decision-making and patient monitoring.</p>
         
         <h3>2.7 Accessibility and Usability Challenges</h3>
-        <p>Many existing health monitoring solutions are designed for tech-savvy users, creating barriers for elderly patients, individuals with cognitive impairments, or those with limited digital literacy. Complex interfaces, lack of voice interaction capabilities, and insufficient caregiver support features prevent these populations from benefiting from remote monitoring technologies.</p>
+        <p>Many existing health monitoring solutions are designed for tech-savvy users, creating barriers for elderly patients, individuals with cognitive impairments, or those with limited digital literacy. Complex interfaces and insufficient caregiver support features prevent these populations from benefiting from remote monitoring technologies.</p>
         
         <h3>2.8 Data Privacy and Security Concerns</h3>
         <p>Health data is among the most sensitive personal information, requiring robust security measures and strict privacy controls. Many existing solutions fail to provide transparent consent management, comprehensive audit trails, or clear data sharing controls, creating concerns that may prevent adoption by both patients and healthcare providers.</p>
@@ -374,11 +334,8 @@
         <h4>3.2.3 Medication Management</h4>
         <p>Implement a comprehensive medication reminder system that provides alerts for dosage times, medication refills, and scheduled doctor visits. The system must support complex medication schedules, recurring reminders, and integration with pharmacy systems for refill notifications.</p>
         
-        <h4>3.2.4 Voice Interaction Capabilities</h4>
-        <p>Integrate speech-to-text and text-to-speech functionality to enable hands-free interaction for users with limited digital literacy or physical limitations. The voice assistant must support medication reminders, vitals queries, emergency activation, and basic health information requests.</p>
-        
-        <h4>3.2.5 Memory Journal for Cognitive Support</h4>
-        <p>Develop a digital memory journal feature that allows patients, particularly those with cognitive disorders, to store important notes, images, and voice recordings. This feature must support easy retrieval, categorization, and sharing with caregivers and healthcare providers.</p>
+        <h4>3.2.4 Memory Journal for Cognitive Support</h4>
+        <p>Develop a digital memory journal feature that allows patients, particularly those with cognitive disorders, to store important notes and images. This feature must support easy retrieval, categorization, and sharing with caregivers and healthcare providers.</p>
         
         <h3>3.3 Technical Objectives</h3>
         
@@ -419,7 +376,7 @@
         
         <p>NeuralTrace provides role-based access for four primary user types: patients who wear monitoring devices and interact with the platform, caregivers who monitor patient health status, licensed healthcare professionals who provide consultations and review patient data, and system administrators who manage platform operations and user verification.</p>
         
-        <p>The platform includes comprehensive features for medication management, voice interaction, memory journaling for cognitive support, medical document processing, and automated clinical reporting. All features are designed with security, privacy, and regulatory compliance as foundational requirements.</p>
+        <p>The platform includes comprehensive features for medication management, memory journaling for cognitive support, medical document processing, and automated clinical reporting. All features are designed with security, privacy, and regulatory compliance as foundational requirements.</p>
         
         <h3>4.2 Technical Scope</h3>
         <p>From a technical perspective, NeuralTrace is implemented as a modern web application using React and TypeScript for the frontend, Supabase for backend services including authentication, database, and serverless functions, and various third-party APIs for device integration, communication services, and AI capabilities.</p>
@@ -490,7 +447,7 @@
         <h3>5.3 User Interfaces</h3>
         
         <h4>5.3.1 Patient Dashboard</h4>
-        <p>The patient dashboard provides users with real-time display of their vital signs, AI-generated health insights, medication reminders, consultation requests, and emergency activation capabilities. The interface is designed for accessibility, with support for voice interaction and simplified navigation for users with limited technical proficiency.</p>
+        <p>The patient dashboard provides users with real-time display of their vital signs, AI-generated health insights, medication reminders, consultation requests, and emergency activation capabilities. The interface is designed for accessibility, with simplified navigation for users with limited technical proficiency.</p>
         
         <h4>5.3.2 Doctor Dashboard</h4>
         <p>The doctor dashboard enables healthcare professionals to view assigned patients, monitor real-time vital signs, review AI-generated insights, access patient history, provide consultations, and manage patient assignments. The interface includes tools for clinical note-taking, report annotation, and communication with patients and caregivers.</p>
@@ -606,7 +563,7 @@
         <p>The platform integrates with multiple wearable device APIs including Apple HealthKit (for iOS devices), Google Fit (for Android devices), Fitbit API, Garmin Connect API, and Samsung Health API. Each integration uses OAuth 2.0 for secure authentication and follows platform-specific data retrieval patterns.</p>
         
         <h4>7.3.2 Communication Services</h4>
-        <p>Twilio is integrated for SMS and voice call capabilities, enabling the emergency response system to contact caregivers and emergency services. The service provides reliable, scalable communication infrastructure with global reach.</p>
+        <p>Twilio is integrated for SMS capabilities, enabling the emergency response system to contact caregivers and emergency services. The service provides reliable, scalable communication infrastructure with global reach.</p>
         
         <h4>7.3.3 OCR and NLP Services</h4>
         <p>Google Cloud Vision API is used for optical character recognition (OCR) of uploaded medical documents. The service provides high-accuracy text extraction from images and PDFs. Clinical natural language processing is implemented using specialized medical NLP models to extract structured information from medical reports.</p>
@@ -677,7 +634,7 @@
                 <tr>
                     <td>Communication</td>
                     <td>Twilio</td>
-                    <td>SMS and voice calls</td>
+                    <td>SMS</td>
                 </tr>
                 <tr>
                     <td>OCR/NLP</td>
@@ -745,7 +702,7 @@
         
         <p>When an emergency condition is detected, the module executes a multi-step response: first verifying the condition through secondary checks to reduce false positives, then initiating parallel notification streams to emergency services, caregivers, and healthcare providers. The module tracks response acknowledgments and escalates if initial contacts do not respond within configured timeframes.</p>
         
-        <p>The module integrates with communication services (Twilio for SMS and voice calls) and emergency service APIs where available. Location data is included in emergency notifications when user consent has been granted. All emergency responses are logged in audit trails for review and improvement.</p>
+        <p>The module integrates with communication services (Twilio for SMS) and emergency service APIs where available. Location data is included in emergency notifications when user consent has been granted. All emergency responses are logged in audit trails for review and improvement.</p>
         
         <div class="figure-placeholder">
             <p><strong>Figure 6: Emergency Escalation Workflow</strong></p>
@@ -755,7 +712,7 @@
         <h4>8.2.6 Healthcare Professional Integration Module</h4>
         <p>The healthcare professional integration module enables licensed doctors to register, verify credentials, access patient data, and provide consultations. The module includes a doctor verification workflow where administrators review submitted credentials before granting full access.</p>
         
-        <p>Once verified, doctors can view assigned patients, access comprehensive health histories, review AI-generated insights, provide clinical notes, and conduct virtual consultations. The module supports both synchronous (video/voice) and asynchronous (messaging) consultation modalities.</p>
+        <p>Once verified, doctors can view assigned patients, access comprehensive health histories, review AI-generated insights, provide clinical notes, and conduct virtual consultations. The module supports both synchronous (video) and asynchronous (messaging) consultation modalities.</p>
         
         <p>Patient assignment functionality allows doctors to claim patients or be assigned by administrators. The module tracks assignment history and enables transfer of care when needed. All doctor interactions with patient data are logged in audit trails for compliance and quality assurance.</p>
         
@@ -792,8 +749,26 @@
         
         <div class="figure-placeholder">
             <p><strong>Figure 2: Database Entity Relationship Diagram</strong></p>
-            <p>[ER Diagram showing: Users (Patients, Doctors, Caregivers, Admins) → Vitals → AI Screening Results → Consultations → Medical Reports → Assignments → Notifications]</p>
+            <p>The complete Entity Relationship Diagram is available in <code>er_diagram.html</code>, showing all tables, their attributes, primary keys, foreign keys, and relationships with cardinalities. The diagram illustrates the relationships between users (profiles), health data (vitals, ai_screening_results), consultations, medical reports, assignments, emergency events, notifications, consent records, and feedback.</p>
+            <p><em>Note: For the printed version, refer to the ER diagram in Appendix A which shows the complete database schema with all relationships clearly labeled.</em></p>
         </div>
+        
+        <h3>9.1.1 Database Table Screenshots</h3>
+        <p>Detailed table structures for all major database tables are available in <code>database_screenshots.html</code>. The screenshots show column names, data types, nullability constraints, default values, and sample data for each table. Key tables include:</p>
+        <ul>
+            <li><strong>profiles</strong>: User profile information with role-specific fields</li>
+            <li><strong>user_roles</strong>: Role assignments linking users to their roles</li>
+            <li><strong>vitals</strong>: Vital signs readings from wearable devices or manual entry</li>
+            <li><strong>ai_screening_results</strong>: AI analysis results with severity classifications</li>
+            <li><strong>consultations</strong>: Doctor-patient consultation records</li>
+            <li><strong>medical_reports</strong>: Uploaded medical documents with OCR and AI processing</li>
+            <li><strong>patient_doctor_assignments</strong>: Assignment relationships between doctors and patients</li>
+            <li><strong>emergency_events</strong>: Emergency alert records with location data</li>
+            <li><strong>notification_preferences</strong>: User notification settings</li>
+            <li><strong>consent_audit</strong>: Audit trail of all consent decisions</li>
+            <li><strong>feedback</strong>: User feedback and bug reports</li>
+        </ul>
+        <p><em>Note: For the printed version, refer to Appendix A for complete database table screenshots formatted for inclusion in the FYP booklet.</em></p>
         
         <h3>9.2 Core Tables</h3>
         
@@ -935,7 +910,7 @@
         
         <p>When a critical condition is detected, the system first performs verification checks to reduce false positives. This may include checking multiple vital signs, reviewing recent trends, or requiring confirmation from multiple data points. Once verified, the system initiates parallel notification streams to maximize the likelihood of rapid response.</p>
         
-        <p>Emergency responses include contacting local emergency services (911 or local equivalent) where supported, sending SMS and voice call notifications to designated caregivers, pushing notifications to mobile applications, and alerting assigned healthcare providers. The system includes location sharing when user consent has been granted, enabling emergency responders to locate patients quickly.</p>
+        <p>Emergency responses include contacting local emergency services (911 or local equivalent) where supported, sending SMS notifications to designated caregivers, pushing notifications to mobile applications, and alerting assigned healthcare providers. The system includes location sharing when user consent has been granted, enabling emergency responders to locate patients quickly.</p>
         
         <p>The escalation system implements configurable priority rules that determine notification order and timing. If initial contacts do not respond within configured timeframes, the system escalates to secondary contacts or alternative communication methods. All emergency responses are logged in comprehensive audit trails for review and system improvement.</p>
         
@@ -1003,13 +978,8 @@
         
         <p>The system supports complex medication schedules including multiple daily doses, weekly medications, as-needed medications, and medication cycles. Reminders can be customized with snooze options, rescheduling capabilities, and confirmation tracking. The system integrates with pharmacy systems where available to provide refill reminders and medication interaction warnings.</p>
         
-        <h3>10.9 Voice Interaction</h3>
-        <p>The voice interaction feature enables hands-free access to platform functionality through speech-to-text and text-to-speech capabilities. Users can activate the voice assistant to receive medication reminders, query current vital signs, request health summaries, and activate emergency responses using voice commands.</p>
-        
-        <p>The voice assistant is designed to accommodate users with limited digital literacy or physical limitations that make traditional interface interaction difficult. The system uses natural language processing to understand user intent and provides clear, spoken responses. Voice interaction is particularly valuable for elderly patients and those with cognitive impairments.</p>
-        
-        <h3>10.10 Memory Journal</h3>
-        <p>The memory journal feature provides a digital space for storing important notes, images, and voice recordings to aid recall, particularly for patients with cognitive disorders. Users can create journal entries with text, photos, and voice memos, organize entries by categories or dates, and share entries with caregivers and healthcare providers.</p>
+        <h3>10.9 Memory Journal</h3>
+        <p>The memory journal feature provides a digital space for storing important notes and images to aid recall, particularly for patients with cognitive disorders. Users can create journal entries with text and photos, organize entries by categories or dates, and share entries with caregivers and healthcare providers.</p>
         
         <p>The journal supports easy retrieval through search functionality and categorization. Entries can be tagged with keywords, dates, or categories to facilitate finding relevant information. The feature is designed with simplicity in mind, recognizing that users with memory impairments need straightforward interfaces.</p>
     </div>
@@ -1461,11 +1431,11 @@
         </div>
     </div>
 
-    <!-- Section 16: Screenshots -->
+    <!-- Section 16: User Interface -->
     <div class="page-break">
-        <h1 id="screenshots">16. Screenshots and User Interface</h1>
+        <h1 id="screenshots">16. User Interface</h1>
         
-        <p>The NeuralTrace user interface is designed for clarity, accessibility, and ease of use across different user types and device sizes. This section provides descriptions of key user interfaces, with placeholders for screenshots that would be included in the printed documentation.</p>
+        <p>The NeuralTrace user interface is designed for clarity, accessibility, and ease of use across different user types and device sizes. This section describes the key user interfaces and their functional capabilities.</p>
         
         <h3>16.1 Patient Dashboard</h3>
         <p>The patient dashboard provides users with a comprehensive view of their health status, including real-time vital signs display, AI-generated health insights, medication reminders, consultation requests, and emergency activation capabilities. The interface uses a clean, uncluttered design with large, readable text and intuitive navigation.</p>
@@ -1495,16 +1465,17 @@
             <p>[Screenshot showing: User statistics cards; System health metrics; Role distribution charts; Activity timeline; Feedback management; Beta invite code management]</p>
         </div>
         
-        <h3>16.4 Mobile Application</h3>
-        <p>The mobile application provides full functionality optimized for smartphone use, with particular attention to one-handed operation and readability on small screens. The interface uses large touch targets, clear typography, and simplified navigation optimized for mobile interaction patterns.</p>
+        <h3>16.4 Device Connection Interface</h3>
+        <p>The device connection interface guides users through connecting their wearable devices, with step-by-step instructions for each supported platform. The interface provides clear feedback on connection status and data synchronization, helping users understand when their devices are properly connected and transmitting data.</p>
+        
+        <h3>16.5 Database Tables and Schema</h3>
+        <p>Complete database table structures and schema information are documented in Appendix A and in the project repository, including column definitions, data types, constraints, and sample data for all major tables.</p>
         
         <div class="figure-placeholder">
-            <p><strong>Figure 11: Mobile Application Interface</strong></p>
-            <p>[Screenshots showing: Mobile dashboard; Vitals input screen; Emergency button interface; Consultation request; Settings screen]</p>
+            <p><strong>Figure 11: Database Table Screenshots</strong></p>
+            <p>[Database table screenshots showing: profiles table, user_roles table, vitals table, ai_screening_results table, consultations table, medical_reports table, patient_doctor_assignments table, emergency_events table, notification_preferences table, consent_audit table, feedback table]</p>
+            <p><em>Complete database table screenshots are available in database_screenshots.html. For printed documentation, refer to Appendix A.</em></p>
         </div>
-        
-        <h3>16.5 Device Connection Interface</h3>
-        <p>The device connection interface guides users through connecting their wearable devices, with step-by-step instructions for each supported platform. The interface provides clear feedback on connection status and data synchronization, helping users understand when their devices are properly connected and transmitting data.</p>
     </div>
 
     <!-- Section 17: Future Work -->
@@ -1524,8 +1495,8 @@
         <h4>17.1.3 Multi-Language Support</h4>
         <p>Internationalization would enable the platform to serve users in multiple languages, expanding accessibility globally. This includes not only interface translation but also support for different date formats, measurement units, and cultural considerations in healthcare communication.</p>
         
-        <h4>17.1.4 Enhanced Voice Assistant</h4>
-        <p>The voice assistant could be enhanced with more natural language understanding, support for complex queries, and proactive health reminders. Integration with smart speakers could enable hands-free interaction throughout the home.</p>
+        <h4>17.1.4 Native Mobile Applications</h4>
+        <p>Development of native mobile applications for iOS and Android platforms would provide enhanced functionality optimized for smartphone use, with particular attention to one-handed operation and readability on small screens. Native applications would offer improved performance, better integration with device sensors and health platforms, push notification capabilities, and offline functionality. The mobile applications would feature large touch targets, clear typography, and simplified navigation optimized for mobile interaction patterns, enabling users to access all platform features including real-time vitals monitoring, AI insights, medication reminders, emergency activation, and consultation requests directly from their smartphones.</p>
         
         <h3>17.2 Technical Improvements</h3>
         
@@ -1664,52 +1635,75 @@
     <div class="page-break appendix">
         <h1 id="appendix">20. Appendix</h1>
         
-        <h3>Appendix A: Database Schema Details</h3>
-        <p>This appendix provides detailed database schema information including table definitions, relationships, indexes, and constraints. The complete SQL schema is available in the project repository.</p>
-        
-        <div class="code-block">
-            <p>-- Example table definition</p>
-            <p>CREATE TABLE public.vitals (</p>
-            <p>  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),</p>
-            <p>  user_id UUID NOT NULL REFERENCES auth.users(id),</p>
-            <p>  heart_rate INTEGER,</p>
-            <p>  blood_pressure_systolic INTEGER,</p>
-            <p>  blood_pressure_diastolic INTEGER,</p>
-            <p>  temperature DECIMAL(4,1),</p>
-            <p>  oxygen_saturation INTEGER,</p>
-            <p>  created_at TIMESTAMP WITH TIME ZONE DEFAULT now()</p>
-            <p>);</p>
-        </div>
-        
-        <h3>Appendix B: API Endpoint Documentation</h3>
+        <h3>Appendix A: API Endpoint Documentation</h3>
         <p>This appendix documents all API endpoints including request/response formats, authentication requirements, and example usage. Complete API documentation is available in the project repository.</p>
         
-        <h3>Appendix C: Installation and Deployment Guide</h3>
+        <h3>Appendix B: Installation and Deployment Guide</h3>
         <p>This appendix provides step-by-step instructions for installing and deploying NeuralTrace, including environment setup, configuration, database migration, and deployment procedures.</p>
         
-        <h3>Appendix D: User Manual</h3>
+        <h3>Appendix C: User Manual</h3>
         <p>This appendix contains user manuals for each user type (patient, caregiver, doctor, admin) with screenshots and step-by-step instructions for using platform features.</p>
         
-        <h3>Appendix E: Test Results</h3>
+        <h3>Appendix D: Test Results</h3>
         <p>This appendix contains detailed test results including unit test coverage reports, integration test results, performance test results, and security test findings.</p>
         
-        <h3>Appendix F: Glossary</h3>
-        <p>This appendix defines technical terms, medical terminology, and acronyms used throughout the documentation.</p>
+        <h3>Appendix E: Glossary</h3>
+        <p>This appendix defines key terms, acronyms, and concepts used throughout the NeuralTrace documentation.</p>
         
-        <h4>F.1 Technical Terms</h4>
+        <h4>E.1 System Architecture Terms</h4>
         <ul>
-            <li><strong>API (Application Programming Interface):</strong> A set of protocols and tools for building software applications.</li>
-            <li><strong>OAuth 2.0:</strong> An authorization framework that enables applications to obtain limited access to user accounts.</li>
-            <li><strong>Row Level Security (RLS):</strong> A database security feature that restricts access to individual rows based on user permissions.</li>
-            <li><strong>Serverless Function:</strong> A cloud computing execution model where the cloud provider manages server infrastructure.</li>
+            <li><strong>Microservices Architecture:</strong> A software architecture pattern where applications are built as a collection of loosely coupled, independently deployable services.</li>
+            <li><strong>Serverless Computing:</strong> A cloud computing execution model where the cloud provider dynamically manages server allocation and provisioning.</li>
+            <li><strong>Real-time Processing:</strong> Data processing that occurs immediately upon data receipt, enabling instant responses and updates.</li>
+            <li><strong>Horizontal Scaling:</strong> The ability to increase system capacity by adding more servers or instances rather than upgrading existing hardware.</li>
         </ul>
         
-        <h4>F.2 Medical Terms</h4>
+        <h4>E.2 Healthcare Technology Terms</h4>
+        <ul>
+            <li><strong>Remote Patient Monitoring (RPM):</strong> A healthcare delivery method that uses technology to monitor patients outside of traditional clinical settings.</li>
+            <li><strong>Telemedicine:</strong> The remote delivery of healthcare services using telecommunications technology.</li>
+            <li><strong>Vital Signs:</strong> Clinical measurements that indicate the state of a patient's essential body functions, including heart rate, blood pressure, temperature, and oxygen saturation.</li>
+            <li><strong>Clinical Decision Support System (CDSS):</strong> Health information technology systems designed to assist healthcare professionals in making clinical decisions.</li>
+        </ul>
+        
+        <h4>E.3 Data Security and Privacy Terms</h4>
+        <ul>
+            <li><strong>HIPAA (Health Insurance Portability and Accountability Act):</strong> U.S. legislation that provides data privacy and security provisions for safeguarding medical information.</li>
+            <li><strong>GDPR (General Data Protection Regulation):</strong> European Union regulation on data protection and privacy that governs the processing of personal data.</li>
+            <li><strong>Encryption:</strong> The process of converting information into a code to prevent unauthorized access.</li>
+            <li><strong>Role-Based Access Control (RBAC):</strong> A method of restricting system access based on user roles and permissions.</li>
+            <li><strong>Audit Trail:</strong> A chronological record of system activities that provides evidence of operations and transactions.</li>
+        </ul>
+        
+        <h4>E.4 Artificial Intelligence Terms</h4>
+        <ul>
+            <li><strong>Machine Learning (ML):</strong> A subset of artificial intelligence that enables systems to learn and improve from experience without being explicitly programmed.</li>
+            <li><strong>Supervised Learning:</strong> A machine learning approach where algorithms learn from labeled training data to make predictions.</li>
+            <li><strong>LSTM (Long Short-Term Memory):</strong> A type of recurrent neural network architecture capable of learning long-term dependencies in sequential data.</li>
+            <li><strong>Anomaly Detection:</strong> The identification of patterns in data that do not conform to expected behavior.</li>
+            <li><strong>Explainable AI:</strong> Artificial intelligence systems designed to provide understandable explanations for their decisions and predictions.</li>
+        </ul>
+        
+        <h4>E.5 Medical Conditions and Terms</h4>
         <ul>
             <li><strong>Tachycardia:</strong> Abnormally rapid heart rate, typically over 100 beats per minute at rest.</li>
             <li><strong>Bradycardia:</strong> Abnormally slow heart rate, typically below 60 beats per minute.</li>
             <li><strong>Hypoxia:</strong> Deficiency in the amount of oxygen reaching body tissues.</li>
-            <li><strong>SpO₂:</strong> Peripheral capillary oxygen saturation, a measure of blood oxygen level.</li>
+            <li><strong>SpO₂:</strong> Peripheral capillary oxygen saturation, a measure of blood oxygen level expressed as a percentage.</li>
+            <li><strong>Hypertension:</strong> Abnormally high blood pressure, typically defined as systolic pressure above 140 mmHg or diastolic pressure above 90 mmHg.</li>
+            <li><strong>Hypotension:</strong> Abnormally low blood pressure, typically defined as systolic pressure below 90 mmHg.</li>
+            <li><strong>Arrhythmia:</strong> An irregular heartbeat rhythm that may be too fast, too slow, or irregular.</li>
+        </ul>
+        
+        <h4>E.6 Technical Acronyms</h4>
+        <ul>
+            <li><strong>API:</strong> Application Programming Interface - a set of protocols and tools for building software applications.</li>
+            <li><strong>OAuth 2.0:</strong> An authorization framework that enables applications to obtain limited access to user accounts.</li>
+            <li><strong>RLS:</strong> Row Level Security - a database security feature that restricts access to individual rows based on user permissions.</li>
+            <li><strong>REST:</strong> Representational State Transfer - an architectural style for designing networked applications.</li>
+            <li><strong>JSON:</strong> JavaScript Object Notation - a lightweight data-interchange format.</li>
+            <li><strong>TLS:</strong> Transport Layer Security - a cryptographic protocol designed to provide secure communication over a network.</li>
+            <li><strong>EHR:</strong> Electronic Health Record - a digital version of a patient's paper medical chart.</li>
         </ul>
     </div>
 

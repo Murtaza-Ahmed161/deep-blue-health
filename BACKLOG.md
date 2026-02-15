@@ -153,7 +153,5 @@
 ## Future Exploration
 - [ ] Integration with electronic health records (EHR) systems
 - [ ] Blockchain for immutable medical records
-- [ ] Voice-controlled doctor interface
 - [ ] AR/VR for remote patient examination
-- [ ] Mental health monitoring through voice analysis
 - [ ] Social determinants of health tracking

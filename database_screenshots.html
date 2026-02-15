@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuralTrace Database Tables</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .table-screenshot {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        .table-header {
+            background: #1e293b;
+            color: white;
+            padding: 15px 20px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        .table-content {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #1e293b;
+            border-bottom: 2px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #334155;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .type-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .type-uuid { background: #dbeafe; color: #1e40af; }
+        .type-text { background: #dcfce7; color: #166534; }
+        .type-int { background: #fef3c7; color: #92400e; }
+        .type-bool { background: #fce7f3; color: #9f1239; }
+        .type-timestamp { background: #e0e7ff; color: #3730a3; }
+        .type-enum { background: #f3e8ff; color: #6b21a8; }
+        .null-value {
+            color: #94a3b8;
+            font-style: italic;
+        }
+        .primary-key {
+            font-weight: 600;
+            color: #dc2626;
+        }
+    </style>
+</head>
+<body>
+    <h1>NeuralTrace Database Tables</h1>
+
+    <!-- Profiles Table -->
+    <div class="table-screenshot">
+        <div class="table-header">profiles</div>
+        <div class="table-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Column</th>
+                        <th>Type</th>
+                        <th>Nullable</th>
+                        <th>Default</th>
+                        <th>Sample Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="primary-key">id (PK)</td>
+                        <td><span class="type-badge type-uuid">UUID</span></td>
+                        <td>NOT NULL</td>
+                        <td>-</td>
+                        <td>550e8400-e29b-41d4-a716-446655440000</td>
+                    </tr>
+                    <tr>
+                        <td>email</td>
+                        <td><span class="type-badge type-text">TEXT</span></td>
+                        <td>NOT NULL</td>
+                        <td>-</td>
+                        <td>john.doe@example.com</td>
+                    </tr>
+                    <tr>
+                        <td>full_name</td>
+                        <td><span class="type-badge type-text">TEXT</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>John Doe</td>
+                    </tr>
+                    <tr>
+                        <td>phone</td>
+                        <td><span class="type-badge type-text">TEXT</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>+1-555-0123</td>
+                    </tr>
+                    <tr>
+                        <td>specialty</td>
+                        <td><span class="type-badge type-text">TEXT</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>Cardiology</td>
+                    </tr>
+                    <tr>
+                        <td>license_number</td>
+                        <td><span class="type-badge type-text">TEXT</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>MD-12345</td>
+                    </tr>
+                    <tr>
+                        <td>emergency_contact_name</td>
+                        <td><span class="type-badge type-text">TEXT</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>Jane Doe</td>
+                    </tr>
+                    <tr>
+                        <td>emergency_contact_phone</td>
+                        <td><span class="type-badge type-text">TEXT</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>+1-555-0124</td>
+                    </tr>
+                    <tr>
+                        <td>created_at</td>
+                        <td><span class="type-badge type-timestamp">TIMESTAMPTZ</span></td>
+                        <td>NOT NULL</td>
+                        <td>now()</td>
+                        <td>2024-01-15 10:30:00+00</td>
+                    </tr>
+                    <tr>
+                        <td>updated_at</td>
+                        <td><span class="type-badge type-timestamp">TIMESTAMPTZ</span></td>
+                        <td>NOT NULL</td>
+                        <td>now()</td>
+                        <td>2024-01-20 14:22:00+00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- User Roles Table -->
+    <div class="table-screenshot">
+        <div class="table-header">user_roles</div>
+        <div class="table-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Column</th>
+                        <th>Type</th>
+                        <th>Nullable</th>
+                        <th>Default</th>
+                        <th>Sample Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="primary-key">id (PK)</td>
+                        <td><span class="type-badge type-uuid">UUID</span></td>
+                        <td>NOT NULL</td>
+                        <td>gen_random_uuid()</td>
+                        <td>660e8400-e29b-41d4-a716-446655440001</td>
+                    </tr>
+                    <tr>
+                        <td>user_id (FK)</td>
+                        <td><span class="type-badge type-uuid">UUID</span></td>
+                        <td>NOT NULL</td>
+                        <td>-</td>
+                        <td>550e8400-e29b-41d4-a716-446655440000</td>
+                    </tr>
+                    <tr>
+                        <td>role</td>
+                        <td><span class="type-badge type-enum">app_role</span></td>
+                        <td>NOT NULL</td>
+                        <td>-</td>
+                        <td>patient</td>
+                    </tr>
+                    <tr>
+                        <td>created_at</td>
+                        <td><span class="type-badge type-timestamp">TIMESTAMPTZ</span></td>
+                        <td>NOT NULL</td>
+                        <td>now()</td>
+                        <td>2024-01-15 10:30:00+00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Vitals Table -->
+    <div class="table-screenshot">
+        <div class="table-header">vitals</div>
+        <div class="table-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Column</th>
+                        <th>Type</th>
+                        <th>Nullable</th>
+                        <th>Default</th>
+                        <th>Sample Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="primary-key">id (PK)</td>
+                        <td><span class="type-badge type-uuid">UUID</span></td>
+                        <td>NOT NULL</td>
+                        <td>gen_random_uuid()</td>
+                        <td>770e8400-e29b-41d4-a716-446655440002</td>
+                    </tr>
+                    <tr>
+                        <td>user_id (FK)</td>
+                        <td><span class="type-badge type-uuid">UUID</span></td>
+                        <td>NOT NULL</td>
+                        <td>-</td>
+                        <td>550e8400-e29b-41d4-a716-446655440000</td>
+                    </tr>
+                    <tr>
+                        <td>heart_rate</td>
+                        <td><span class="type-badge type-int">INTEGER</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>72</td>
+                    </tr>
+                    <tr>
+                        <td>blood_pressure_systolic</td>
+                        <td><span class="type-badge type-int">INTEGER</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>120</td>
+                    </tr>
+                    <tr>
+                        <td>blood_pressure_diastolic</td>
+                        <td><span class="type-badge type-int">INTEGER</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>80</td>
+                    </tr>
+                    <tr>
+                        <td>temperature</td>
+                        <td><span class="type-badge type-int">DECIMAL(4,1)</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>98.6</td>
+                    </tr>
+                    <tr>
+                        <td>oxygen_saturation</td>
+                        <td><span class="type-badge type-int">INTEGER</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>98</td>
+                    </tr>
+                    <tr>
+                        <td>respiratory_rate</td>
+                        <td><span class="type-badge type-int">INTEGER</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>16</td>
+                    </tr>
+                    <tr>
+                        <td>device_type</td>
+                        <td><span class="type-badge type-text">TEXT</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>Apple Watch</td>
+                    </tr>
+                    <tr>
+                        <td>source</td>
+                        <td><span class="type-badge type-text">TEXT</span></td>
+                        <td>NULL</td>
+                        <td>'wearable'</td>
+                        <td>wearable</td>
+                    </tr>
+                    <tr>
+                        <td>created_at</td>
+                        <td><span class="type-badge type-timestamp">TIMESTAMPTZ</span></td>
+                        <td>NOT NULL</td>
+                        <td>now()</td>
+                        <td>2024-01-20 14:30:00+00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- AI Screening Results Table -->
+    <div class="table-screenshot">
+        <div class="table-header">ai_screening_results</div>
+        <div class="table-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Column</th>
+                        <th>Type</th>
+                        <th>Nullable</th>
+                        <th>Default</th>
+                        <th>Sample Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="primary-key">id (PK)</td>
+                        <td><span class="type-badge type-uuid">UUID</span></td>
+                        <td>NOT NULL</td>
+                        <td>gen_random_uuid()</td>
+                        <td>880e8400-e29b-41d4-a716-446655440003</td>
+                    </tr>
+                    <tr>
+                        <td>user_id (FK)</td>
+                        <td><span class="type-badge type-uuid">UUID</span></td>
+                        <td>NOT NULL</td>
+                        <td>-</td>
+                        <td>550e8400-e29b-41d4-a716-446655440000</td>
+                    </tr>
+                    <tr>
+                        <td>vitals_id (FK)</td>
+                        <td><span class="type-badge type-uuid">UUID</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>770e8400-e29b-41d4-a716-446655440002</td>
+                    </tr>
+                    <tr>
+                        <td>confidence_level</td>
+                        <td><span class="type-badge type-int">DECIMAL(3,2)</span></td>
+                        <td>NOT NULL</td>
+                        <td>-</td>
+                        <td>0.95</td>
+                    </tr>
+                    <tr>
+                        <td>anomaly_detected</td>
+                        <td><span class="type-badge type-bool">BOOLEAN</span></td>
+                        <td>NOT NULL</td>
+                        <td>false</td>
+                        <td>true</td>
+                    </tr>
+                    <tr>
+                        <td>explanation</td>
+                        <td><span class="type-badge type-text">TEXT</span></td>
+                        <td>NOT NULL</td>
+                        <td>-</td>
+                        <td>Elevated heart rate detected...</td>
+                    </tr>
+                    <tr>
+                        <td>severity</td>
+                        <td><span class="type-badge type-enum">TEXT</span></td>
+                        <td>NOT NULL</td>
+                        <td>-</td>
+                        <td>warning</td>
+                    </tr>
+                    <tr>
+                        <td>recommendations</td>
+                        <td><span class="type-badge type-text">TEXT[]</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>["Monitor closely", "Consult doctor"]</td>
+                    </tr>
+                    <tr>
+                        <td>created_at</td>
+                        <td><span class="type-badge type-timestamp">TIMESTAMPTZ</span></td>
+                        <td>NOT NULL</td>
+                        <td>now()</td>
+                        <td>2024-01-20 14:30:05+00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Consultations Table -->
+    <div class="table-screenshot">
+        <div class="table-header">consultations</div>
+        <div class="table-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Column</th>
+                        <th>Type</th>
+                        <th>Nullable</th>
+                        <th>Default</th>
+                        <th>Sample Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="primary-key">id (PK)</td>
+                        <td><span class="type-badge type-uuid">UUID</span></td>
+                        <td>NOT NULL</td>
+                        <td>gen_random_uuid()</td>
+                        <td>990e8400-e29b-41d4-a716-446655440004</td>
+                    </tr>
+                    <tr>
+                        <td>patient_id (FK)</td>
+                        <td><span class="type-badge type-uuid">UUID</span></td>
+                        <td>NOT NULL</td>
+                        <td>-</td>
+                        <td>550e8400-e29b-41d4-a716-446655440000</td>
+                    </tr>
+                    <tr>
+                        <td>doctor_id (FK)</td>
+                        <td><span class="type-badge type-uuid">UUID</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>550e8400-e29b-41d4-a716-446655440010</td>
+                    </tr>
+                    <tr>
+                        <td>scheduled_at</td>
+                        <td><span class="type-badge type-timestamp">TIMESTAMPTZ</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>2024-01-25 15:00:00+00</td>
+                    </tr>
+                    <tr>
+                        <td>status</td>
+                        <td><span class="type-badge type-enum">TEXT</span></td>
+                        <td>NOT NULL</td>
+                        <td>'pending'</td>
+                        <td>confirmed</td>
+                    </tr>
+                    <tr>
+                        <td>consultation_type</td>
+                        <td><span class="type-badge type-enum">TEXT</span></td>
+                        <td>NOT NULL</td>
+                        <td>-</td>
+                        <td>video</td>
+                    </tr>
+                    <tr>
+                        <td>notes</td>
+                        <td><span class="type-badge type-text">TEXT</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>Patient reports chest pain...</td>
+                    </tr>
+                    <tr>
+                        <td>patient_notes</td>
+                        <td><span class="type-badge type-text">TEXT</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>Feeling better today</td>
+                    </tr>
+                    <tr>
+                        <td>doctor_notes</td>
+                        <td><span class="type-badge type-text">TEXT</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>Vitals stable, continue monitoring</td>
+                    </tr>
+                    <tr>
+                        <td>created_at</td>
+                        <td><span class="type-badge type-timestamp">TIMESTAMPTZ</span></td>
+                        <td>NOT NULL</td>
+                        <td>now()</td>
+                        <td>2024-01-20 16:00:00+00</td>
+                    </tr>
+                    <tr>
+                        <td>updated_at</td>
+                        <td><span class="type-badge type-timestamp">TIMESTAMPTZ</span></td>
+                        <td>NOT NULL</td>
+                        <td>now()</td>
+                        <td>2024-01-25 15:30:00+00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Medical Reports Table -->
+    <div class="table-screenshot">
+        <div class="table-header">medical_reports</div>
+        <div class="table-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Column</th>
+                        <th>Type</th>
+                        <th>Nullable</th>
+                        <th>Default</th>
+                        <th>Sample Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="primary-key">id (PK)</td>
+                        <td><span class="type-badge type-uuid">UUID</span></td>
+                        <td>NOT NULL</td>
+                        <td>gen_random_uuid()</td>
+                        <td>aa0e8400-e29b-41d4-a716-446655440005</td>
+                    </tr>
+                    <tr>
+                        <td>user_id (FK)</td>
+                        <td><span class="type-badge type-uuid">UUID</span></td>
+                        <td>NOT NULL</td>
+                        <td>-</td>
+                        <td>550e8400-e29b-41d4-a716-446655440000</td>
+                    </tr>
+                    <tr>
+                        <td>file_url</td>
+                        <td><span class="type-badge type-text">TEXT</span></td>
+                        <td>NOT NULL</td>
+                        <td>-</td>
+                        <td>https://storage.../report.pdf</td>
+                    </tr>
+                    <tr>
+                        <td>file_name</td>
+                        <td><span class="type-badge type-text">TEXT</span></td>
+                        <td>NOT NULL</td>
+                        <td>-</td>
+                        <td>blood_test_2024.pdf</td>
+                    </tr>
+                    <tr>
+                        <td>file_type</td>
+                        <td><span class="type-badge type-text">TEXT</span></td>
+                        <td>NOT NULL</td>
+                        <td>-</td>
+                        <td>application/pdf</td>
+                    </tr>
+                    <tr>
+                        <td>ocr_text</td>
+                        <td><span class="type-badge type-text">TEXT</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>Blood Test Results...</td>
+                    </tr>
+                    <tr>
+                        <td>ai_summary</td>
+                        <td><span class="type-badge type-text">TEXT</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>Normal CBC results...</td>
+                    </tr>
+                    <tr>
+                        <td>ai_tags</td>
+                        <td><span class="type-badge type-text">TEXT[]</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>["CBC", "Normal"]</td>
+                    </tr>
+                    <tr>
+                        <td>status</td>
+                        <td><span class="type-badge type-enum">TEXT</span></td>
+                        <td>NOT NULL</td>
+                        <td>'pending'</td>
+                        <td>processed</td>
+                    </tr>
+                    <tr>
+                        <td>doctor_notes</td>
+                        <td><span class="type-badge type-text">TEXT</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>All values within normal range</td>
+                    </tr>
+                    <tr>
+                        <td>reviewed_by (FK)</td>
+                        <td><span class="type-badge type-uuid">UUID</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>550e8400-e29b-41d4-a716-446655440010</td>
+                    </tr>
+                    <tr>
+                        <td>reviewed_at</td>
+                        <td><span class="type-badge type-timestamp">TIMESTAMPTZ</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>2024-01-21 10:00:00+00</td>
+                    </tr>
+                    <tr>
+                        <td>created_at</td>
+                        <td><span class="type-badge type-timestamp">TIMESTAMPTZ</span></td>
+                        <td>NOT NULL</td>
+                        <td>now()</td>
+                        <td>2024-01-20 18:00:00+00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Patient Doctor Assignments Table -->
+    <div class="table-screenshot">
+        <div class="table-header">patient_doctor_assignments</div>
+        <div class="table-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Column</th>
+                        <th>Type</th>
+                        <th>Nullable</th>
+                        <th>Default</th>
+                        <th>Sample Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="primary-key">id (PK)</td>
+                        <td><span class="type-badge type-uuid">UUID</span></td>
+                        <td>NOT NULL</td>
+                        <td>gen_random_uuid()</td>
+                        <td>bb0e8400-e29b-41d4-a716-446655440006</td>
+                    </tr>
+                    <tr>
+                        <td>patient_id (FK)</td>
+                        <td><span class="type-badge type-uuid">UUID</span></td>
+                        <td>NOT NULL</td>
+                        <td>-</td>
+                        <td>550e8400-e29b-41d4-a716-446655440000</td>
+                    </tr>
+                    <tr>
+                        <td>doctor_id (FK)</td>
+                        <td><span class="type-badge type-uuid">UUID</span></td>
+                        <td>NOT NULL</td>
+                        <td>-</td>
+                        <td>550e8400-e29b-41d4-a716-446655440010</td>
+                    </tr>
+                    <tr>
+                        <td>assigned_at</td>
+                        <td><span class="type-badge type-timestamp">TIMESTAMPTZ</span></td>
+                        <td>NOT NULL</td>
+                        <td>now()</td>
+                        <td>2024-01-15 12:00:00+00</td>
+                    </tr>
+                    <tr>
+                        <td>assigned_by (FK)</td>
+                        <td><span class="type-badge type-uuid">UUID</span></td>
+                        <td>NOT NULL</td>
+                        <td>-</td>
+                        <td>550e8400-e29b-41d4-a716-446655440010</td>
+                    </tr>
+                    <tr>
+                        <td>status</td>
+                        <td><span class="type-badge type-enum">TEXT</span></td>
+                        <td>NOT NULL</td>
+                        <td>'active'</td>
+                        <td>active</td>
+                    </tr>
+                    <tr>
+                        <td>notes</td>
+                        <td><span class="type-badge type-text">TEXT</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>Primary care physician</td>
+                    </tr>
+                    <tr>
+                        <td>created_at</td>
+                        <td><span class="type-badge type-timestamp">TIMESTAMPTZ</span></td>
+                        <td>NOT NULL</td>
+                        <td>now()</td>
+                        <td>2024-01-15 12:00:00+00</td>
+                    </tr>
+                    <tr>
+                        <td>updated_at</td>
+                        <td><span class="type-badge type-timestamp">TIMESTAMPTZ</span></td>
+                        <td>NOT NULL</td>
+                        <td>now()</td>
+                        <td>2024-01-15 12:00:00+00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Emergency Events Table -->
+    <div class="table-screenshot">
+        <div class="table-header">emergency_events</div>
+        <div class="table-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Column</th>
+                        <th>Type</th>
+                        <th>Nullable</th>
+                        <th>Default</th>
+                        <th>Sample Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="primary-key">id (PK)</td>
+                        <td><span class="type-badge type-uuid">UUID</span></td>
+                        <td>NOT NULL</td>
+                        <td>gen_random_uuid()</td>
+                        <td>cc0e8400-e29b-41d4-a716-446655440007</td>
+                    </tr>
+                    <tr>
+                        <td>patient_id (FK)</td>
+                        <td><span class="type-badge type-uuid">UUID</span></td>
+                        <td>NOT NULL</td>
+                        <td>-</td>
+                        <td>550e8400-e29b-41d4-a716-446655440000</td>
+                    </tr>
+                    <tr>
+                        <td>triggered_by (FK)</td>
+                        <td><span class="type-badge type-uuid">UUID</span></td>
+                        <td>NOT NULL</td>
+                        <td>-</td>
+                        <td>550e8400-e29b-41d4-a716-446655440000</td>
+                    </tr>
+                    <tr>
+                        <td>triggered_at</td>
+                        <td><span class="type-badge type-timestamp">TIMESTAMPTZ</span></td>
+                        <td>NOT NULL</td>
+                        <td>now()</td>
+                        <td>2024-01-20 15:30:00+00</td>
+                    </tr>
+                    <tr>
+                        <td>location_lat</td>
+                        <td><span class="type-badge type-int">DECIMAL(10,8)</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>40.712776</td>
+                    </tr>
+                    <tr>
+                        <td>location_lng</td>
+                        <td><span class="type-badge type-int">DECIMAL(11,8)</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>-74.005974</td>
+                    </tr>
+                    <tr>
+                        <td>location_consented</td>
+                        <td><span class="type-badge type-bool">BOOLEAN</span></td>
+                        <td>NOT NULL</td>
+                        <td>false</td>
+                        <td>true</td>
+                    </tr>
+                    <tr>
+                        <td>status</td>
+                        <td><span class="type-badge type-enum">TEXT</span></td>
+                        <td>NOT NULL</td>
+                        <td>'pending'</td>
+                        <td>sent</td>
+                    </tr>
+                    <tr>
+                        <td>notes</td>
+                        <td><span class="type-badge type-text">TEXT</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>Critical heart rate detected</td>
+                    </tr>
+                    <tr>
+                        <td>created_at</td>
+                        <td><span class="type-badge type-timestamp">TIMESTAMPTZ</span></td>
+                        <td>NOT NULL</td>
+                        <td>now()</td>
+                        <td>2024-01-20 15:30:00+00</td>
+                    </tr>
+                    <tr>
+                        <td>updated_at</td>
+                        <td><span class="type-badge type-timestamp">TIMESTAMPTZ</span></td>
+                        <td>NOT NULL</td>
+                        <td>now()</td>
+                        <td>2024-01-20 15:31:00+00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Notifications Table -->
+    <div class="table-screenshot">
+        <div class="table-header">notification_preferences</div>
+        <div class="table-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Column</th>
+                        <th>Type</th>
+                        <th>Nullable</th>
+                        <th>Default</th>
+                        <th>Sample Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="primary-key">id (PK)</td>
+                        <td><span class="type-badge type-uuid">UUID</span></td>
+                        <td>NOT NULL</td>
+                        <td>gen_random_uuid()</td>
+                        <td>dd0e8400-e29b-41d4-a716-446655440008</td>
+                    </tr>
+                    <tr>
+                        <td>user_id (FK)</td>
+                        <td><span class="type-badge type-uuid">UUID</span></td>
+                        <td>NOT NULL</td>
+                        <td>-</td>
+                        <td>550e8400-e29b-41d4-a716-446655440000</td>
+                    </tr>
+                    <tr>
+                        <td>critical_alerts</td>
+                        <td><span class="type-badge type-bool">BOOLEAN</span></td>
+                        <td>NOT NULL</td>
+                        <td>true</td>
+                        <td>true</td>
+                    </tr>
+                    <tr>
+                        <td>new_reports</td>
+                        <td><span class="type-badge type-bool">BOOLEAN</span></td>
+                        <td>NOT NULL</td>
+                        <td>true</td>
+                        <td>true</td>
+                    </tr>
+                    <tr>
+                        <td>doctor_messages</td>
+                        <td><span class="type-badge type-bool">BOOLEAN</span></td>
+                        <td>NOT NULL</td>
+                        <td>true</td>
+                        <td>true</td>
+                    </tr>
+                    <tr>
+                        <td>vitals_warnings</td>
+                        <td><span class="type-badge type-bool">BOOLEAN</span></td>
+                        <td>NOT NULL</td>
+                        <td>true</td>
+                        <td>true</td>
+                    </tr>
+                    <tr>
+                        <td>push_enabled</td>
+                        <td><span class="type-badge type-bool">BOOLEAN</span></td>
+                        <td>NOT NULL</td>
+                        <td>false</td>
+                        <td>true</td>
+                    </tr>
+                    <tr>
+                        <td>email_enabled</td>
+                        <td><span class="type-badge type-bool">BOOLEAN</span></td>
+                        <td>NOT NULL</td>
+                        <td>true</td>
+                        <td>true</td>
+                    </tr>
+                    <tr>
+                        <td>created_at</td>
+                        <td><span class="type-badge type-timestamp">TIMESTAMPTZ</span></td>
+                        <td>NOT NULL</td>
+                        <td>now()</td>
+                        <td>2024-01-15 10:30:00+00</td>
+                    </tr>
+                    <tr>
+                        <td>updated_at</td>
+                        <td><span class="type-badge type-timestamp">TIMESTAMPTZ</span></td>
+                        <td>NOT NULL</td>
+                        <td>now()</td>
+                        <td>2024-01-20 14:00:00+00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Consent Audit Table -->
+    <div class="table-screenshot">
+        <div class="table-header">consent_audit</div>
+        <div class="table-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Column</th>
+                        <th>Type</th>
+                        <th>Nullable</th>
+                        <th>Default</th>
+                        <th>Sample Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="primary-key">id (PK)</td>
+                        <td><span class="type-badge type-uuid">UUID</span></td>
+                        <td>NOT NULL</td>
+                        <td>gen_random_uuid()</td>
+                        <td>ee0e8400-e29b-41d4-a716-446655440009</td>
+                    </tr>
+                    <tr>
+                        <td>user_id (FK)</td>
+                        <td><span class="type-badge type-uuid">UUID</span></td>
+                        <td>NOT NULL</td>
+                        <td>-</td>
+                        <td>550e8400-e29b-41d4-a716-446655440000</td>
+                    </tr>
+                    <tr>
+                        <td>consent_type</td>
+                        <td><span class="type-badge type-enum">consent_type</span></td>
+                        <td>NOT NULL</td>
+                        <td>-</td>
+                        <td>device_data</td>
+                    </tr>
+                    <tr>
+                        <td>granted</td>
+                        <td><span class="type-badge type-bool">BOOLEAN</span></td>
+                        <td>NOT NULL</td>
+                        <td>-</td>
+                        <td>true</td>
+                    </tr>
+                    <tr>
+                        <td>ip_address</td>
+                        <td><span class="type-badge type-text">TEXT</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>192.168.1.1</td>
+                    </tr>
+                    <tr>
+                        <td>user_agent</td>
+                        <td><span class="type-badge type-text">TEXT</span></td>
+                        <td>NULL</td>
+                        <td>-</td>
+                        <td>Mozilla/5.0...</td>
+                    </tr>
+                    <tr>
+                        <td>metadata</td>
+                        <td><span class="type-badge type-text">JSONB</span></td>
+                        <td>NULL</td>
+                        <td>'{}'::jsonb</td>
+                        <td>{"device": "iPhone"}</td>
+                    </tr>
+                    <tr>
+                        <td>created_at</td>
+                        <td><span class="type-badge type-timestamp">TIMESTAMPTZ</span></td>
+                        <td>NOT NULL</td>
+                        <td>now()</td>
+                        <td>2024-01-15 10:30:00+00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Feedback Table -->
+    <div class="table-screenshot">
+        <div class="table-header">feedback</div>
+        <div class="table-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Column</th>
+                        <th>Type</th>
+                        <th>Nullable</th>
+                        <th>Default</th>
+                        <th>Sample Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="primary-key">id (PK)</td>
+                        <td><span class="type-badge type-uuid">UUID</span></td>
+                        <td>NOT NULL</td>
+                        <td>gen_random_uuid()</td>
+                        <td>ff0e8400-e29b-41d4-a716-446655440010</td>
+                    </tr>
+                    <tr>
+                        <td>user_id (FK)</td>
+                        <td><span class="type-badge type-uuid">UUID</span></td>
+                        <td>NOT NULL</td>
+                        <td>-</td>
+                        <td>550e8400-e29b-41d4-a716-446655440000</td>
+                    </tr>
+                    <tr>
+                        <td>type</td>
+                        <td><span class="type-badge type-enum">TEXT</span></td>
+                        <td>NOT NULL</td>
+                        <td>-</td>
+                        <td>bug</td>
+                    </tr>
+                    <tr>
+                        <td>title</td>
+                        <td><span class="type-badge type-text">TEXT</span></td>
+                        <td>NOT NULL</td>
+                        <td>-</td>
+                        <td>Dashboard not loading</td>
+                    </tr>
+                    <tr>
+                        <td>description</td>
+                        <td><span class="type-badge type-text">TEXT</span></td>
+                        <td>NOT NULL</td>
+                        <td>-</td>
+                        <td>Patient dashboard fails to load...</td>
+                    </tr>
+                    <tr>
+                        <td>status</td>
+                        <td><span class="type-badge type-enum">TEXT</span></td>
+                        <td>NOT NULL</td>
+                        <td>'new'</td>
+                        <td>in_progress</td>
+                    </tr>
+                    <tr>
+                        <td>priority</td>
+                        <td><span class="type-badge type-enum">TEXT</span></td>
+                        <td>NULL</td>
+                        <td>'medium'</td>
+                        <td>high</td>
+                    </tr>
+                    <tr>
+                        <td>created_at</td>
+                        <td><span class="type-badge type-timestamp">TIMESTAMPTZ</span></td>
+                        <td>NOT NULL</td>
+                        <td>now()</td>
+                        <td>2024-01-20 12:00:00+00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+</html>
+

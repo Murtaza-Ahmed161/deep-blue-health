@@ -7,7 +7,7 @@ remembering daily tasks, important events, medications, and personal information
 to stress, dependence on caregivers, and reduced independence.
 This project proposes the development of NeuralTrace, an AI-powered memory assistant
 designed to help individuals with cognitive disorders manage memory and daily tasks. The system
-will provide personalized reminders, task management, voice-assisted interaction, and
+will provide personalized reminders, task management, and
 AI-driven recommendations to support patients in their day-to-day lives while reducing the
 burden on caregivers.
 2. Objectives
@@ -16,7 +16,7 @@ The primary objectives of NeuralTrace are:
 tasks.
 ● To provide reminders for medications, appointments, and events through multiple
 notification channels.
-● To support voice-based interaction for users with limited digital literacy.
+● To support simplified interaction for users with limited digital literacy.
 ● To allow caregiver integration for remote monitoring and support.
 ● To enhance independence and quality of life for individuals with cognitive disorders.
 3. Problem Statement
@@ -30,8 +30,7 @@ NeuralTrace will be an AI-powered web/mobile platform that helps patients organi
 information in real-time. Key features include:
 ● Smart Reminders: Notifications for medications, appointments, and daily tasks (with
 snooze and reschedule options).
-● Voice Assistant: Speech-to-text and text-to-speech features for easy interaction.
-● Memory Journal: A digital space for storing important notes, photos, and voice memos to
+● Memory Journal: A digital space for storing important notes and photos to
 aid recall.
 ● Caregiver Dashboard: Remote monitoring for caregivers to check patient activities and
 receive alerts.
@@ -41,8 +40,7 @@ hydration, exercise, or rest).
 5. Key Features
 1. Daily Task Manager – Input tasks/events with deadlines and recurring schedules.
 2. Medication & Health Reminders – Alerts for dosage times, refills, and doctor visits.
-3. Voice Interaction – Hands-free access for patients with limited digital skills.
-4. Memory Journal – Store notes, images, and voice recordings for personal recall.
+3. Memory Journal – Store notes and images for personal recall.
 5. Caregiver Integration – Shared access for caregivers to monitor tasks and receive
 notifications.
 6. AI Personalization – Adaptive reminders based on usage history and user needs.
@@ -50,7 +48,6 @@ notifications.
 ● Frontend: React (Web) / Flutter (Mobile) with TailwindCSS for UI.
 Backend: Firebase or Supabase (authentication, database, notifications).
 ● AI Layer: Python (FastAPI/Flask) for personalization & scheduling logic.
-Voice Processing: Google Speech-to-Text API or OpenAI Whisper (free/low-cost).
 ● Notifications: Firebase Cloud Messaging, Email, and SMS (via free APIs like Twilio trial).
 ● Hosting: Vercel/Netlify for frontend, Firebase Cloud Functions for backend.
 7. Methodology
@@ -61,7 +58,7 @@ Voice Processing: Google Speech-to-Text API or OpenAI Whisper (free/low-cost).
 ○ Memory journal & notes storage
 ○ Caregiver dashboard
 ○ AI-based personalization
-4. Integration – Voice assistant and notification services.
+4. Integration – Notification services.
 5. Testing – Usability testing with sample users and caregivers.
 6. Evaluation – Measure effectiveness in improving memory management.
 9. Expected Outcomes
@@ -72,7 +69,7 @@ Voice Processing: Google Speech-to-Text API or OpenAI Whisper (free/low-cost).
 11. Risks & Mitigation
 ● Data Privacy: Sensitive health data requires protection → Mitigation: End-to-end
 encryption, user consent, and anonymized testing data.
-● Digital Literacy Issues: Some users may struggle with apps → Mitigation: Voice assistant
+● Digital Literacy Issues: Some users may struggle with apps → Mitigation: Simplified UI
 and simplified UI.
 ● Overdependence: Users may rely too much on the app → Mitigation: Encourage caregiver
 integration and balance AI use.

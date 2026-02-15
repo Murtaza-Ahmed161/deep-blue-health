@@ -24,15 +24,10 @@ This document compares the features proposed in `proposal.md` and `prd.md` again
 - **Implementation**: No medication reminder system found
 - **Backlog Reference**: Listed in BACKLOG.md as future work (Priority 7)
 
-### 1.3 Voice Interaction
-**Status: ❌ NOT IMPLEMENTED**
-- **Proposed**: Speech-to-text and text-to-speech for hands-free access
-- **Implementation**: No voice interaction components found
-- **Backlog Reference**: Listed as enhancement (multi-language voice assistant)
 
 ### 1.4 Memory Journal
 **Status: ❌ NOT IMPLEMENTED**
-- **Proposed**: Store notes, images, and voice recordings for personal recall
+- **Proposed**: Store notes and images for personal recall
 - **Implementation**: No dedicated journal/memory storage feature
 - **Note**: Has been replaced by medical report uploads and vitals tracking
 
@@ -221,7 +216,7 @@ This document compares the features proposed in `proposal.md` and `prd.md` again
 The application has **pivoted significantly** from the original proposal (memory assistant for cognitive disorders) to a **health monitoring platform** focused on vitals tracking, AI screening, and doctor-patient connectivity. 
 
 **Key Findings:**
-1. Original proposal features (tasks, medication reminders, voice, journal) are largely abandoned
+1. Original proposal features (tasks, medication reminders, journal) are largely abandoned
 2. Health monitoring features from PRD are well-implemented
 3. Doctor integration is fully functional
 4. Device connectivity is scaffolded but needs real API integrations
@@ -244,7 +239,6 @@ The application has **pivoted significantly** from the original proposal (memory
 3. **Enhance AI** - Replace rule-based with ML models for better predictions
 
 ### Low Priority (Nice to Have)
-1. **Voice assistant** - Add speech-to-text/text-to-speech
 2. **Medication reminders** - Implement if aligned with health monitoring focus
 3. **Memory journal** - Only if returning to original cognitive disorder focus
 

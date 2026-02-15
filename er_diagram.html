@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuralTrace ER Diagram</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 40px;
+        }
+        .er-diagram {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 40px;
+            overflow-x: auto;
+        }
+        svg {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .entity {
+            fill: #ffffff;
+            stroke: #1e293b;
+            stroke-width: 2;
+        }
+        .entity-header {
+            fill: #1e293b;
+        }
+        .entity-header-text {
+            fill: #ffffff;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .attribute {
+            fill: #f8f9fa;
+        }
+        .attribute-text {
+            fill: #334155;
+            font-size: 12px;
+        }
+        .pk {
+            fill: #fee2e2;
+            font-weight: 600;
+        }
+        .fk {
+            fill: #dbeafe;
+        }
+        .relationship-line {
+            stroke: #64748b;
+            stroke-width: 2;
+            fill: none;
+            marker-end: url(#arrowhead);
+        }
+        .relationship-label {
+            fill: #64748b;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .legend {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .legend-item {
+            display: inline-block;
+            margin-right: 20px;
+            margin-bottom: 10px;
+        }
+        .legend-box {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            vertical-align: middle;
+            margin-right: 8px;
+            border: 1px solid #1e293b;
+        }
+    </style>
+</head>
+<body>
+    <h1>NeuralTrace Entity Relationship Diagram</h1>
+    
+    <div class="er-diagram">
+        <svg width="2400" height="1800" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                    <polygon points="0 0, 10 3, 0 6" fill="#64748b" />
+                </marker>
+            </defs>
+
+            <!-- Profiles Entity -->
+            <g id="profiles">
+                <rect x="50" y="50" width="200" height="280" class="entity" rx="4"/>
+                <rect x="50" y="50" width="200" height="30" class="entity-header" rx="4"/>
+                <text x="150" y="70" text-anchor="middle" class="entity-header-text">profiles</text>
+                <rect x="60" y="90" width="180" height="20" class="pk"/>
+                <text x="70" y="103" class="attribute-text">🔑 id (PK)</text>
+                <rect x="60" y="110" width="180" height="20" class="attribute"/>
+                <text x="70" y="123" class="attribute-text">email</text>
+                <rect x="60" y="130" width="180" height="20" class="attribute"/>
+                <text x="70" y="143" class="attribute-text">full_name</text>
+                <rect x="60" y="150" width="180" height="20" class="attribute"/>
+                <text x="70" y="163" class="attribute-text">phone</text>
+                <rect x="60" y="170" width="180" height="20" class="attribute"/>
+                <text x="70" y="183" class="attribute-text">specialty</text>
+                <rect x="60" y="190" width="180" height="20" class="attribute"/>
+                <text x="70" y="203" class="attribute-text">license_number</text>
+                <rect x="60" y="210" width="180" height="20" class="attribute"/>
+                <text x="70" y="223" class="attribute-text">emergency_contact_name</text>
+                <rect x="60" y="230" width="180" height="20" class="attribute"/>
+                <text x="70" y="243" class="attribute-text">emergency_contact_phone</text>
+                <rect x="60" y="250" width="180" height="20" class="attribute"/>
+                <text x="70" y="263" class="attribute-text">created_at</text>
+                <rect x="60" y="270" width="180" height="20" class="attribute"/>
+                <text x="70" y="283" class="attribute-text">updated_at</text>
+            </g>
+
+            <!-- User Roles Entity -->
+            <g id="user_roles">
+                <rect x="350" y="50" width="200" height="130" class="entity" rx="4"/>
+                <rect x="350" y="50" width="200" height="30" class="entity-header" rx="4"/>
+                <text x="450" y="70" text-anchor="middle" class="entity-header-text">user_roles</text>
+                <rect x="360" y="90" width="180" height="20" class="pk"/>
+                <text x="370" y="103" class="attribute-text">🔑 id (PK)</text>
+                <rect x="360" y="110" width="180" height="20" class="fk"/>
+                <text x="370" y="123" class="attribute-text">→ user_id (FK)</text>
+                <rect x="360" y="130" width="180" height="20" class="attribute"/>
+                <text x="370" y="143" class="attribute-text">role</text>
+                <rect x="360" y="150" width="180" height="20" class="attribute"/>
+                <text x="370" y="163" class="attribute-text">created_at</text>
+            </g>
+
+            <!-- Vitals Entity -->
+            <g id="vitals">
+                <rect x="650" y="50" width="220" height="310" class="entity" rx="4"/>
+                <rect x="650" y="50" width="220" height="30" class="entity-header" rx="4"/>
+                <text x="760" y="70" text-anchor="middle" class="entity-header-text">vitals</text>
+                <rect x="660" y="90" width="200" height="20" class="pk"/>
+                <text x="670" y="103" class="attribute-text">🔑 id (PK)</text>
+                <rect x="660" y="110" width="200" height="20" class="fk"/>
+                <text x="670" y="123" class="attribute-text">→ user_id (FK)</text>
+                <rect x="660" y="130" width="200" height="20" class="attribute"/>
+                <text x="670" y="143" class="attribute-text">heart_rate</text>
+                <rect x="660" y="150" width="200" height="20" class="attribute"/>
+                <text x="670" y="163" class="attribute-text">blood_pressure_systolic</text>
+                <rect x="660" y="170" width="200" height="20" class="attribute"/>
+                <text x="670" y="183" class="attribute-text">blood_pressure_diastolic</text>
+                <rect x="660" y="190" width="200" height="20" class="attribute"/>
+                <text x="670" y="203" class="attribute-text">temperature</text>
+                <rect x="660" y="210" width="200" height="20" class="attribute"/>
+                <text x="670" y="223" class="attribute-text">oxygen_saturation</text>
+                <rect x="660" y="230" width="200" height="20" class="attribute"/>
+                <text x="670" y="243" class="attribute-text">respiratory_rate</text>
+                <rect x="660" y="250" width="200" height="20" class="attribute"/>
+                <text x="670" y="263" class="attribute-text">device_type</text>
+                <rect x="660" y="270" width="200" height="20" class="attribute"/>
+                <text x="670" y="283" class="attribute-text">source</text>
+                <rect x="660" y="290" width="200" height="20" class="attribute"/>
+                <text x="670" y="303" class="attribute-text">created_at</text>
+            </g>
+
+            <!-- AI Screening Results Entity -->
+            <g id="ai_screening_results">
+                <rect x="950" y="50" width="240" height="270" class="entity" rx="4"/>
+                <rect x="950" y="50" width="240" height="30" class="entity-header" rx="4"/>
+                <text x="1070" y="70" text-anchor="middle" class="entity-header-text">ai_screening_results</text>
+                <rect x="960" y="90" width="220" height="20" class="pk"/>
+                <text x="970" y="103" class="attribute-text">🔑 id (PK)</text>
+                <rect x="960" y="110" width="220" height="20" class="fk"/>
+                <text x="970" y="123" class="attribute-text">→ user_id (FK)</text>
+                <rect x="960" y="130" width="220" height="20" class="fk"/>
+                <text x="970" y="143" class="attribute-text">→ vitals_id (FK)</text>
+                <rect x="960" y="150" width="220" height="20" class="attribute"/>
+                <text x="970" y="163" class="attribute-text">confidence_level</text>
+                <rect x="960" y="170" width="220" height="20" class="attribute"/>
+                <text x="970" y="183" class="attribute-text">anomaly_detected</text>
+                <rect x="960" y="190" width="220" height="20" class="attribute"/>
+                <text x="970" y="203" class="attribute-text">explanation</text>
+                <rect x="960" y="210" width="220" height="20" class="attribute"/>
+                <text x="970" y="223" class="attribute-text">severity</text>
+                <rect x="960" y="230" width="220" height="20" class="attribute"/>
+                <text x="970" y="243" class="attribute-text">recommendations</text>
+                <rect x="960" y="250" width="220" height="20" class="attribute"/>
+                <text x="970" y="263" class="attribute-text">created_at</text>
+            </g>
+
+            <!-- Consultations Entity -->
+            <g id="consultations">
+                <rect x="50" y="450" width="240" height="320" class="entity" rx="4"/>
+                <rect x="50" y="450" width="240" height="30" class="entity-header" rx="4"/>
+                <text x="170" y="470" text-anchor="middle" class="entity-header-text">consultations</text>
+                <rect x="60" y="490" width="220" height="20" class="pk"/>
+                <text x="70" y="503" class="attribute-text">🔑 id (PK)</text>
+                <rect x="60" y="510" width="220" height="20" class="fk"/>
+                <text x="70" y="523" class="attribute-text">→ patient_id (FK)</text>
+                <rect x="60" y="530" width="220" height="20" class="fk"/>
+                <text x="70" y="543" class="attribute-text">→ doctor_id (FK)</text>
+                <rect x="60" y="550" width="220" height="20" class="attribute"/>
+                <text x="70" y="563" class="attribute-text">scheduled_at</text>
+                <rect x="60" y="570" width="220" height="20" class="attribute"/>
+                <text x="70" y="583" class="attribute-text">status</text>
+                <rect x="60" y="590" width="220" height="20" class="attribute"/>
+                <text x="70" y="603" class="attribute-text">consultation_type</text>
+                <rect x="60" y="610" width="220" height="20" class="attribute"/>
+                <text x="70" y="623" class="attribute-text">notes</text>
+                <rect x="60" y="630" width="220" height="20" class="attribute"/>
+                <text x="70" y="643" class="attribute-text">patient_notes</text>
+                <rect x="60" y="650" width="220" height="20" class="attribute"/>
+                <text x="70" y="663" class="attribute-text">doctor_notes</text>
+                <rect x="60" y="670" width="220" height="20" class="attribute"/>
+                <text x="70" y="683" class="attribute-text">created_at</text>
+                <rect x="60" y="690" width="220" height="20" class="attribute"/>
+                <text x="70" y="703" class="attribute-text">updated_at</text>
+            </g>
+
+            <!-- Medical Reports Entity -->
+            <g id="medical_reports">
+                <rect x="350" y="450" width="240" height="360" class="entity" rx="4"/>
+                <rect x="350" y="450" width="240" height="30" class="entity-header" rx="4"/>
+                <text x="470" y="470" text-anchor="middle" class="entity-header-text">medical_reports</text>
+                <rect x="360" y="490" width="220" height="20" class="pk"/>
+                <text x="370" y="503" class="attribute-text">🔑 id (PK)</text>
+                <rect x="360" y="510" width="220" height="20" class="fk"/>
+                <text x="370" y="523" class="attribute-text">→ user_id (FK)</text>
+                <rect x="360" y="530" width="220" height="20" class="attribute"/>
+                <text x="370" y="543" class="attribute-text">file_url</text>
+                <rect x="360" y="550" width="220" height="20" class="attribute"/>
+                <text x="370" y="563" class="attribute-text">file_name</text>
+                <rect x="360" y="570" width="220" height="20" class="attribute"/>
+                <text x="370" y="583" class="attribute-text">file_type</text>
+                <rect x="360" y="590" width="220" height="20" class="attribute"/>
+                <text x="370" y="603" class="attribute-text">ocr_text</text>
+                <rect x="360" y="610" width="220" height="20" class="attribute"/>
+                <text x="370" y="623" class="attribute-text">ai_summary</text>
+                <rect x="360" y="630" width="220" height="20" class="attribute"/>
+                <text x="370" y="643" class="attribute-text">ai_tags</text>
+                <rect x="360" y="650" width="220" height="20" class="attribute"/>
+                <text x="370" y="663" class="attribute-text">status</text>
+                <rect x="360" y="670" width="220" height="20" class="attribute"/>
+                <text x="370" y="683" class="attribute-text">doctor_notes</text>
+                <rect x="360" y="690" width="220" height="20" class="fk"/>
+                <text x="370" y="703" class="attribute-text">→ reviewed_by (FK)</text>
+                <rect x="360" y="710" width="220" height="20" class="attribute"/>
+                <text x="370" y="723" class="attribute-text">reviewed_at</text>
+                <rect x="360" y="730" width="220" height="20" class="attribute"/>
+                <text x="370" y="743" class="attribute-text">created_at</text>
+            </g>
+
+            <!-- Patient Doctor Assignments Entity -->
+            <g id="patient_doctor_assignments">
+                <rect x="650" y="450" width="280" height="260" class="entity" rx="4"/>
+                <rect x="650" y="450" width="280" height="30" class="entity-header" rx="4"/>
+                <text x="790" y="470" text-anchor="middle" class="entity-header-text">patient_doctor_assignments</text>
+                <rect x="660" y="490" width="260" height="20" class="pk"/>
+                <text x="670" y="503" class="attribute-text">🔑 id (PK)</text>
+                <rect x="660" y="510" width="260" height="20" class="fk"/>
+                <text x="670" y="523" class="attribute-text">→ patient_id (FK)</text>
+                <rect x="660" y="530" width="260" height="20" class="fk"/>
+                <text x="670" y="543" class="attribute-text">→ doctor_id (FK)</text>
+                <rect x="660" y="550" width="260" height="20" class="attribute"/>
+                <text x="670" y="563" class="attribute-text">assigned_at</text>
+                <rect x="660" y="570" width="260" height="20" class="fk"/>
+                <text x="670" y="583" class="attribute-text">→ assigned_by (FK)</text>
+                <rect x="660" y="590" width="260" height="20" class="attribute"/>
+                <text x="670" y="603" class="attribute-text">status</text>
+                <rect x="660" y="610" width="260" height="20" class="attribute"/>
+                <text x="670" y="623" class="attribute-text">notes</text>
+                <rect x="660" y="630" width="260" height="20" class="attribute"/>
+                <text x="670" y="643" class="attribute-text">created_at</text>
+                <rect x="660" y="650" width="260" height="20" class="attribute"/>
+                <text x="670" y="663" class="attribute-text">updated_at</text>
+            </g>
+
+            <!-- Emergency Events Entity -->
+            <g id="emergency_events">
+                <rect x="50" y="900" width="240" height="310" class="entity" rx="4"/>
+                <rect x="50" y="900" width="240" height="30" class="entity-header" rx="4"/>
+                <text x="170" y="920" text-anchor="middle" class="entity-header-text">emergency_events</text>
+                <rect x="60" y="940" width="220" height="20" class="pk"/>
+                <text x="70" y="953" class="attribute-text">🔑 id (PK)</text>
+                <rect x="60" y="960" width="220" height="20" class="fk"/>
+                <text x="70" y="973" class="attribute-text">→ patient_id (FK)</text>
+                <rect x="60" y="980" width="220" height="20" class="fk"/>
+                <text x="70" y="993" class="attribute-text">→ triggered_by (FK)</text>
+                <rect x="60" y="1000" width="220" height="20" class="attribute"/>
+                <text x="70" y="1013" class="attribute-text">triggered_at</text>
+                <rect x="60" y="1020" width="220" height="20" class="attribute"/>
+                <text x="70" y="1033" class="attribute-text">location_lat</text>
+                <rect x="60" y="1040" width="220" height="20" class="attribute"/>
+                <text x="70" y="1053" class="attribute-text">location_lng</text>
+                <rect x="60" y="1060" width="220" height="20" class="attribute"/>
+                <text x="70" y="1073" class="attribute-text">location_consented</text>
+                <rect x="60" y="1080" width="220" height="20" class="attribute"/>
+                <text x="70" y="1093" class="attribute-text">status</text>
+                <rect x="60" y="1100" width="220" height="20" class="attribute"/>
+                <text x="70" y="1113" class="attribute-text">notes</text>
+                <rect x="60" y="1120" width="220" height="20" class="attribute"/>
+                <text x="70" y="1133" class="attribute-text">created_at</text>
+                <rect x="60" y="1140" width="220" height="20" class="attribute"/>
+                <text x="70" y="1153" class="attribute-text">updated_at</text>
+            </g>
+
+            <!-- Notification Preferences Entity -->
+            <g id="notification_preferences">
+                <rect x="350" y="900" width="280" height="280" class="entity" rx="4"/>
+                <rect x="350" y="900" width="280" height="30" class="entity-header" rx="4"/>
+                <text x="490" y="920" text-anchor="middle" class="entity-header-text">notification_preferences</text>
+                <rect x="360" y="940" width="260" height="20" class="pk"/>
+                <text x="370" y="953" class="attribute-text">🔑 id (PK)</text>
+                <rect x="360" y="960" width="260" height="20" class="fk"/>
+                <text x="370" y="973" class="attribute-text">→ user_id (FK)</text>
+                <rect x="360" y="980" width="260" height="20" class="attribute"/>
+                <text x="370" y="993" class="attribute-text">critical_alerts</text>
+                <rect x="360" y="1000" width="260" height="20" class="attribute"/>
+                <text x="370" y="1013" class="attribute-text">new_reports</text>
+                <rect x="360" y="1020" width="260" height="20" class="attribute"/>
+                <text x="370" y="1033" class="attribute-text">doctor_messages</text>
+                <rect x="360" y="1040" width="260" height="20" class="attribute"/>
+                <text x="370" y="1053" class="attribute-text">vitals_warnings</text>
+                <rect x="360" y="1060" width="260" height="20" class="attribute"/>
+                <text x="370" y="1073" class="attribute-text">push_enabled</text>
+                <rect x="360" y="1080" width="260" height="20" class="attribute"/>
+                <text x="370" y="1093" class="attribute-text">email_enabled</text>
+                <rect x="360" y="1100" width="260" height="20" class="attribute"/>
+                <text x="370" y="1113" class="attribute-text">created_at</text>
+                <rect x="360" y="1120" width="260" height="20" class="attribute"/>
+                <text x="370" y="1133" class="attribute-text">updated_at</text>
+            </g>
+
+            <!-- Consent Audit Entity -->
+            <g id="consent_audit">
+                <rect x="650" y="900" width="240" height="240" class="entity" rx="4"/>
+                <rect x="650" y="900" width="240" height="30" class="entity-header" rx="4"/>
+                <text x="770" y="920" text-anchor="middle" class="entity-header-text">consent_audit</text>
+                <rect x="660" y="940" width="220" height="20" class="pk"/>
+                <text x="670" y="953" class="attribute-text">🔑 id (PK)</text>
+                <rect x="660" y="960" width="220" height="20" class="fk"/>
+                <text x="670" y="973" class="attribute-text">→ user_id (FK)</text>
+                <rect x="660" y="980" width="220" height="20" class="attribute"/>
+                <text x="670" y="993" class="attribute-text">consent_type</text>
+                <rect x="660" y="1000" width="220" height="20" class="attribute"/>
+                <text x="670" y="1013" class="attribute-text">granted</text>
+                <rect x="660" y="1020" width="220" height="20" class="attribute"/>
+                <text x="670" y="1033" class="attribute-text">ip_address</text>
+                <rect x="660" y="1040" width="220" height="20" class="attribute"/>
+                <text x="670" y="1053" class="attribute-text">user_agent</text>
+                <rect x="660" y="1060" width="220" height="20" class="attribute"/>
+                <text x="670" y="1073" class="attribute-text">metadata</text>
+                <rect x="660" y="1080" width="220" height="20" class="attribute"/>
+                <text x="670" y="1093" class="attribute-text">created_at</text>
+            </g>
+
+            <!-- Feedback Entity -->
+            <g id="feedback">
+                <rect x="950" y="900" width="200" height="240" class="entity" rx="4"/>
+                <rect x="950" y="900" width="200" height="30" class="entity-header" rx="4"/>
+                <text x="1050" y="920" text-anchor="middle" class="entity-header-text">feedback</text>
+                <rect x="960" y="940" width="180" height="20" class="pk"/>
+                <text x="970" y="953" class="attribute-text">🔑 id (PK)</text>
+                <rect x="960" y="960" width="180" height="20" class="fk"/>
+                <text x="970" y="973" class="attribute-text">→ user_id (FK)</text>
+                <rect x="960" y="980" width="180" height="20" class="attribute"/>
+                <text x="970" y="993" class="attribute-text">type</text>
+                <rect x="960" y="1000" width="180" height="20" class="attribute"/>
+                <text x="970" y="1013" class="attribute-text">title</text>
+                <rect x="960" y="1020" width="180" height="20" class="attribute"/>
+                <text x="970" y="1033" class="attribute-text">description</text>
+                <rect x="960" y="1040" width="180" height="20" class="attribute"/>
+                <text x="970" y="1053" class="attribute-text">status</text>
+                <rect x="960" y="1060" width="180" height="20" class="attribute"/>
+                <text x="970" y="1073" class="attribute-text">priority</text>
+                <rect x="960" y="1080" width="180" height="20" class="attribute"/>
+                <text x="970" y="1093" class="attribute-text">created_at</text>
+            </g>
+
+            <!-- Relationships -->
+            <!-- user_roles -> profiles -->
+            <line x1="350" y1="115" x2="250" y2="115" class="relationship-line"/>
+            <text x="280" y="110" class="relationship-label">1:N</text>
+
+            <!-- vitals -> profiles -->
+            <line x1="650" y1="125" x2="250" y2="125" class="relationship-line"/>
+            <text x="420" y="120" class="relationship-label">N:1</text>
+
+            <!-- ai_screening_results -> profiles -->
+            <line x1="950" y1="125" x2="250" y2="125" class="relationship-line"/>
+            <text x="570" y="120" class="relationship-label">N:1</text>
+
+            <!-- ai_screening_results -> vitals -->
+            <line x1="950" y1="145" x2="870" y2="145" class="relationship-line"/>
+            <text x="900" y="140" class="relationship-label">N:1</text>
+
+            <!-- consultations -> profiles (patient) -->
+            <line x1="50" y1="520" x2="150" y2="330" class="relationship-line"/>
+            <text x="80" y="420" class="relationship-label">N:1</text>
+
+            <!-- consultations -> profiles (doctor) -->
+            <line x1="50" y1="540" x2="150" y2="330" class="relationship-line"/>
+            <text x="80" y="440" class="relationship-label">N:1</text>
+
+            <!-- medical_reports -> profiles -->
+            <line x1="350" y1="520" x2="250" y2="330" class="relationship-line"/>
+            <text x="280" y="420" class="relationship-label">N:1</text>
+
+            <!-- medical_reports -> profiles (reviewed_by) -->
+            <line x1="350" y1="700" x2="250" y2="330" class="relationship-line"/>
+            <text x="280" y="520" class="relationship-label">N:1</text>
+
+            <!-- patient_doctor_assignments -> profiles (patient) -->
+            <line x1="650" y1="520" x2="250" y2="330" class="relationship-line"/>
+            <text x="420" y="420" class="relationship-label">N:1</text>
+
+            <!-- patient_doctor_assignments -> profiles (doctor) -->
+            <line x1="650" y1="540" x2="250" y2="330" class="relationship-line"/>
+            <text x="420" y="440" class="relationship-label">N:1</text>
+
+            <!-- patient_doctor_assignments -> profiles (assigned_by) -->
+            <line x1="650" y1="580" x2="250" y2="330" class="relationship-line"/>
+            <text x="420" y="460" class="relationship-label">N:1</text>
+
+            <!-- emergency_events -> profiles (patient) -->
+            <line x1="50" y1="970" x2="150" y2="330" class="relationship-line"/>
+            <text x="80" y="650" class="relationship-label">N:1</text>
+
+            <!-- emergency_events -> profiles (triggered_by) -->
+            <line x1="50" y1="990" x2="150" y2="330" class="relationship-line"/>
+            <text x="80" y="670" class="relationship-label">N:1</text>
+
+            <!-- notification_preferences -> profiles -->
+            <line x1="350" y1="970" x2="250" y2="330" class="relationship-line"/>
+            <text x="280" y="650" class="relationship-label">1:1</text>
+
+            <!-- consent_audit -> profiles -->
+            <line x1="650" y1="970" x2="250" y2="330" class="relationship-line"/>
+            <text x="420" y="650" class="relationship-label">N:1</text>
+
+            <!-- feedback -> profiles -->
+            <line x1="950" y1="970" x2="250" y2="330" class="relationship-line"/>
+            <text x="570" y="650" class="relationship-label">N:1</text>
+
+        </svg>
+    </div>
+
+    <div class="legend">
+        <h3>Legend</h3>
+        <div class="legend-item">
+            <span class="legend-box" style="background: #fee2e2;"></span>
+            <span>Primary Key (PK)</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-box" style="background: #dbeafe;"></span>
+            <span>Foreign Key (FK)</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-box" style="background: #f8f9fa; border: 1px solid #1e293b;"></span>
+            <span>Regular Attribute</span>
+        </div>
+        <div class="legend-item">
+            <span style="color: #64748b;">━━━</span>
+            <span>Relationship (with cardinality)</span>
+        </div>
+    </div>
+
+    <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+        <h3>Key Relationships</h3>
+        <ul>
+            <li><strong>profiles</strong> (1) ←→ (N) <strong>user_roles</strong>: One user can have multiple roles</li>
+            <li><strong>profiles</strong> (1) ←→ (N) <strong>vitals</strong>: One user can have many vital sign readings</li>
+            <li><strong>profiles</strong> (1) ←→ (N) <strong>ai_screening_results</strong>: One user can have many AI screening results</li>
+            <li><strong>vitals</strong> (1) ←→ (N) <strong>ai_screening_results</strong>: One vital reading can have multiple AI analyses</li>
+            <li><strong>profiles</strong> (1) ←→ (N) <strong>consultations</strong>: One patient can have many consultations</li>
+            <li><strong>profiles</strong> (1) ←→ (N) <strong>consultations</strong>: One doctor can have many consultations</li>
+            <li><strong>profiles</strong> (1) ←→ (N) <strong>medical_reports</strong>: One user can upload many medical reports</li>
+            <li><strong>profiles</strong> (1) ←→ (N) <strong>patient_doctor_assignments</strong>: One patient can be assigned to one doctor (active assignment)</li>
+            <li><strong>profiles</strong> (1) ←→ (N) <strong>emergency_events</strong>: One patient can trigger many emergency events</li>
+            <li><strong>profiles</strong> (1) ←→ (1) <strong>notification_preferences</strong>: One user has one notification preference record</li>
+            <li><strong>profiles</strong> (1) ←→ (N) <strong>consent_audit</strong>: One user can have many consent records</li>
+            <li><strong>profiles</strong> (1) ←→ (N) <strong>feedback</strong>: One user can submit many feedback entries</li>
+        </ul>
+    </div>
+
+</body>
+</html>
+
