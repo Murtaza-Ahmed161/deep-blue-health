@@ -66,7 +66,8 @@ const About = () => {
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             NeuralTrace is an AI-powered continuous health monitoring platform designed to 
             bridge the gap between patients and healthcare providers through real-time 
-            vital sign tracking, intelligent alerts, and seamless communication.
+            vital sign tracking, intelligent alerts, and seamless communication. Developed 
+            as a Final Year Project to address healthcare challenges in Pakistan.
           </p>
         </div>
       </section>
@@ -79,9 +80,10 @@ const About = () => {
               Our Mission
             </h2>
             <p className="text-lg text-muted-foreground">
-              To empower patients and healthcare providers with AI-driven insights that enable 
-              proactive, personalized care. We believe that continuous monitoring combined with 
-              human expertise leads to better health outcomes for everyone.
+              To empower patients and healthcare providers in Pakistan with AI-driven insights 
+              that enable proactive, personalized care. We believe that continuous monitoring 
+              combined with human expertise leads to better health outcomes, especially in 
+              resource-constrained healthcare systems.
             </p>
           </div>
         </div>
@@ -137,6 +139,15 @@ const About = () => {
             <div className="space-y-6">
               <Card className="p-6">
                 <h3 className="text-lg font-semibold text-foreground mb-2">
+                  Pakistan Emergency Integration
+                </h3>
+                <p className="text-muted-foreground">
+                  Integrated with Pakistan's emergency services including 115 (Ambulance), 
+                  1122 (Rescue Services), and Edhi Ambulance (1021) for rapid emergency response.
+                </p>
+              </Card>
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold text-foreground mb-2">
                   HIPAA Compliant
                 </h3>
                 <p className="text-muted-foreground">
@@ -171,7 +182,10 @@ const About = () => {
       <section className="py-8 border-t border-border">
         <div className="container mx-auto px-4 text-center">
           <p className="text-muted-foreground">
-            NeuralTrace v1.0.0 Beta
+            NeuralTrace v1.0.0 Beta - Final Year Project
+          </p>
+          <p className="text-sm text-muted-foreground/70 mt-1">
+            Developed for healthcare monitoring in Pakistan
           </p>
           <p className="text-sm text-muted-foreground/70 mt-1">
             © 2024 NeuralTrace. All rights reserved.

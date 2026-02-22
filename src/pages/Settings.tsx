@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Save, User, Bell, Shield, FileCheck, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Save, User, Bell, Shield, FileCheck, AlertTriangle, HelpCircle, Info, MessageSquare } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -14,6 +14,7 @@ import NotificationSettings from "@/components/settings/NotificationSettings";
 import TwoFactorSetup from "@/components/settings/TwoFactorSetup";
 import { ConsentAuditTrail } from "@/components/settings/ConsentAuditTrail";
 import EmergencyContactSettings from "@/components/settings/EmergencyContactSettings";
+import FeedbackButton from "@/components/feedback/FeedbackButton";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -86,7 +87,7 @@ const Settings = () => {
 
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="profile">
               <User className="mr-2 h-4 w-4" />
               Profile
@@ -106,6 +107,10 @@ const Settings = () => {
             <TabsTrigger value="consent">
               <FileCheck className="mr-2 h-4 w-4" />
               Consent
+            </TabsTrigger>
+            <TabsTrigger value="help">
+              <HelpCircle className="mr-2 h-4 w-4" />
+              Help
             </TabsTrigger>
           </TabsList>
 
@@ -259,6 +264,67 @@ const Settings = () => {
 
           <TabsContent value="consent">
             <ConsentAuditTrail />
+          </TabsContent>
+
+          <TabsContent value="help" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Info className="h-5 w-5" />
+                  About NeuralTrace
+                </CardTitle>
+                <CardDescription>
+                  Learn more about the platform
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  onClick={() => navigate('/about')}
+                >
+                  <Info className="mr-2 h-4 w-4" />
+                  View About Page
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <HelpCircle className="h-5 w-5" />
+                  Support & Help
+                </CardTitle>
+                <CardDescription>
+                  Get help and contact support
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  onClick={() => navigate('/support')}
+                >
+                  <HelpCircle className="mr-2 h-4 w-4" />
+                  Visit Support Center
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageSquare className="h-5 w-5" />
+                  Send Feedback
+                </CardTitle>
+                <CardDescription>
+                  Help us improve NeuralTrace
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <FeedbackButton variant="outline" size="default" />
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>

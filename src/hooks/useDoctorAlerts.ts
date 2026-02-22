@@ -110,7 +110,8 @@ export const useDoctorAlerts = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, role]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, role]);
 
   const acknowledgeAlert = async (alertId: string) => {
     try {

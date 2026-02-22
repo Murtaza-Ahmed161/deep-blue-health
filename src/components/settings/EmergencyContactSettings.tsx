@@ -201,12 +201,21 @@ const EmergencyContactSettings = () => {
         )}
 
         {/* Important Notice */}
+        <div className="bg-blue-50 border border-blue-200 dark:bg-blue-950 dark:border-blue-800 p-4 rounded-lg">
+          <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2">Pakistan Emergency Services</h4>
+          <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+            <li>• <strong>115</strong> - National Ambulance Service</li>
+            <li>• <strong>1122</strong> - Rescue Services (Punjab, KP, Balochistan)</li>
+            <li>• <strong>1021</strong> - Edhi Ambulance (Nationwide 24/7)</li>
+          </ul>
+        </div>
+
         <div className="bg-destructive/10 border border-destructive/20 p-4 rounded-lg">
           <h4 className="font-medium text-destructive mb-2">Important Notice</h4>
           <ul className="text-sm text-destructive space-y-1">
             <li>• Emergency alerts are sent via email to your account email address</li>
-            <li>• This system does NOT contact emergency services (911)</li>
-            <li>• For life-threatening emergencies, always call 911 first</li>
+            <li>• This system does NOT contact emergency services directly</li>
+            <li>• For life-threatening emergencies, call 115 (Ambulance) or 1122 (Rescue) first</li>
             <li>• Make sure your emergency contact knows they may receive these alerts</li>
           </ul>
         </div>

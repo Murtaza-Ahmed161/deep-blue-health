@@ -2,12 +2,13 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Heart, Activity, Thermometer, Droplet, Save, CheckCircle, Loader2 } from "lucide-react";
+import { ArrowLeft, Heart, Activity, Thermometer, Droplet, CheckCircle, Loader2 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import DoctorNotesSection from "@/components/doctor/DoctorNotesSection";
 
 interface PatientProfile {
   id: string;
@@ -29,12 +30,14 @@ const PatientDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [notes, setNotes] = useState("");
+  const { user, role } = useAuth();
   const [reviewStatus, setReviewStatus] = useState<"pending" | "reviewed" | "followup">("pending");
   const [patient, setPatient] = useState<PatientProfile | null>(null);
   const [vitalsData, setVitalsData] = useState<VitalReading[]>([]);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState<"normal" | "warning" | "critical">("normal");
+  
+  const isDoctor = role === 'doctor';
 
   // Fetch real patient data from Supabase
   useEffect(() => {
@@ -139,13 +142,6 @@ const PatientDetail = () => {
   const age = patient?.created_at
     ? Math.floor((Date.now() - new Date(patient.created_at).getTime()) / (1000 * 60 * 60 * 24 * 365))
     : null;
-
-  const handleSaveNotes = () => {
-    toast({
-      title: "Notes saved",
-      description: "Patient notes have been updated successfully.",
-    });
-  };
 
   const handleUpdateStatus = (status: typeof reviewStatus) => {
     setReviewStatus(status);
@@ -326,6 +322,9 @@ const PatientDetail = () => {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Doctor Notes Section */}
+            {id && <DoctorNotesSection patientId={id} isDoctor={isDoctor} />}
+
             {/* Review Status */}
             <Card>
               <CardHeader>
@@ -351,25 +350,7 @@ const PatientDetail = () => {
               </CardContent>
             </Card>
 
-            {/* Doctor's Notes */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Doctor's Notes</CardTitle>
-                <CardDescription>Clinical observations and plan</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Textarea
-                  placeholder="Enter clinical notes, observations, and treatment plan..."
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  rows={8}
-                />
-                <Button onClick={handleSaveNotes} className="w-full">
-                  <Save className="mr-2 h-4 w-4" />
-                  Save Notes
-                </Button>
-              </CardContent>
-            </Card>
+
           </div>
         </div>
       </div>

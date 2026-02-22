@@ -37,9 +37,10 @@ export const useDoctorPatients = () => {
 
   useEffect(() => {
     fetchPatients();
-  }, [user, role]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, role]);
 
-  // Subscribe to realtime updates
+  // Subscribe to realtime updates (only for assignment changes)
   useEffect(() => {
     if (!user || role !== 'doctor') return;
 
@@ -57,34 +58,13 @@ export const useDoctorPatients = () => {
           fetchPatients();
         }
       )
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'vitals',
-        },
-        () => {
-          fetchPatients();
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'ai_screening_results',
-        },
-        () => {
-          fetchPatients();
-        }
-      )
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, role]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, role]);
 
   const assignPatient = async (patientId: string, notes?: string) => {
     if (!user) throw new Error('User not authenticated');

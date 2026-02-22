@@ -13,6 +13,9 @@ import AIInsights from "@/components/dashboard/AIInsights";
 import ReportUpload from "@/components/patient/ReportUpload";
 import ConsultationRequest from "@/components/patient/ConsultationRequest";
 import VitalsInputSection from "@/components/patient/VitalsInputSection";
+import VitalsHistory from "@/components/patient/VitalsHistory";
+import MedicationReminders from "@/components/patient/MedicationReminders";
+import WelcomeCard from "@/components/dashboard/WelcomeCard";
 import FeedbackButton from "@/components/feedback/FeedbackButton";
 import { useSessionTracking } from "@/hooks/useSessionTracking";
 import { SkeletonVitalsCard, SkeletonCard } from "@/components/ui/skeleton-card";
@@ -23,7 +26,10 @@ import { useUptimeMonitoring } from "@/hooks/useUptimeMonitoring";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useVitals } from "@/hooks/useVitals";
 import EmergencyButton from "@/components/emergency/EmergencyButton";
+import EmergencyButtonCompact from "@/components/emergency/EmergencyButtonCompact";
+import DemoModeControl from "@/components/patient/DemoModeControl";
 import CoreSystemTest from "@/components/debug/CoreSystemTest";
+import { useDemoMode } from "@/hooks/useDemoMode";
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
@@ -61,6 +67,29 @@ const PatientDashboard = () => {
     connectDevice,
     disconnectDevice,
   } = useVitals();
+
+  // Demo Mode
+  const demoMode = useDemoMode({
+    updateInterval: 10000, // 10 seconds
+    scenario: 'mixed'
+  });
+
+  // Auto-save vitals when demo mode updates
+  useEffect(() => {
+    if (demoMode.isActive && demoMode.updateCount > 0) {
+      const vitals = {
+        heartRate: demoMode.currentVitals.heartRate,
+        bloodPressureSystolic: demoMode.currentVitals.bloodPressureSystolic,
+        bloodPressureDiastolic: demoMode.currentVitals.bloodPressureDiastolic,
+        oxygenSaturation: demoMode.currentVitals.oxygenSaturation,
+        temperature: demoMode.currentVitals.temperature,
+        respiratoryRate: demoMode.currentVitals.respiratoryRate
+      };
+      
+      console.log('🎬 Demo Mode: Auto-saving vitals...', vitals);
+      saveVitals(vitals, 'wearable'); // Mark as wearable to differentiate from manual
+    }
+  }, [demoMode.updateCount, demoMode.isActive]);
 
   // Reliability features
   const { isOnline } = useOnlineStatus();
@@ -160,7 +189,14 @@ const PatientDashboard = () => {
     return (
       <div className="min-h-screen bg-muted">
         <div className="container mx-auto px-4 py-8">
-          <SkeletonCard />
+          <div className="space-y-6 animate-fade-in">
+            <div className="h-32 bg-muted-foreground/10 rounded-lg skeleton-shimmer" />
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="h-64 bg-muted-foreground/10 rounded-lg skeleton-shimmer" />
+              <div className="h-64 bg-muted-foreground/10 rounded-lg skeleton-shimmer" />
+            </div>
+            <div className="h-96 bg-muted-foreground/10 rounded-lg skeleton-shimmer" />
+          </div>
         </div>
       </div>
     );
@@ -186,19 +222,10 @@ const PatientDashboard = () => {
               
               {/* Desktop Actions */}
               <div className="hidden md:flex items-center gap-2">
+                <EmergencyButtonCompact variant="navbar" />
                 <ThemeToggle />
-                <FeedbackButton />
-                <Button variant="ghost" size="sm" onClick={() => navigate('/about')}>
-                  <Info className="mr-2 h-4 w-4" />
-                  About
-                </Button>
-                <Button variant="ghost" size="sm" onClick={() => navigate('/support')}>
-                  <HelpCircle className="mr-2 h-4 w-4" />
-                  Support
-                </Button>
-                <Button variant="outline" onClick={() => navigate('/settings')}>
-                  <Settings className="mr-2 h-4 w-4" />
-                  Settings
+                <Button variant="ghost" size="icon" onClick={() => navigate('/settings')}>
+                  <Settings className="h-5 w-5" />
                 </Button>
                 <Button variant="ghost" onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" />
@@ -215,18 +242,11 @@ const PatientDashboard = () => {
                 </SheetTrigger>
                 <SheetContent>
                   <div className="flex flex-col gap-4 mt-8">
+                    {/* Emergency Button - Most Important */}
+                    <EmergencyButtonCompact variant="full" />
                     <div className="flex justify-end mb-2">
                       <ThemeToggle />
                     </div>
-                    <FeedbackButton variant="outline" size="default" />
-                    <Button variant="outline" onClick={() => navigate('/about')} className="w-full justify-start">
-                      <Info className="mr-2 h-4 w-4" />
-                      About
-                    </Button>
-                    <Button variant="outline" onClick={() => navigate('/support')} className="w-full justify-start">
-                      <HelpCircle className="mr-2 h-4 w-4" />
-                      Support
-                    </Button>
                     <Button variant="outline" onClick={() => navigate('/settings')} className="w-full justify-start">
                       <Settings className="mr-2 h-4 w-4" />
                       Settings
@@ -245,6 +265,19 @@ const PatientDashboard = () => {
         <div className="container mx-auto px-3 md:px-4 py-4 md:py-8">
           {/* Desktop View */}
           <div className="hidden md:grid gap-6">
+            {/* Welcome Card */}
+            <WelcomeCard 
+              latestVitals={currentVitals}
+            />
+
+            {/* Demo Mode Control */}
+            <DemoModeControl
+              isActive={demoMode.isActive}
+              updateCount={demoMode.updateCount}
+              scenario={demoMode.scenario}
+              onToggle={demoMode.toggleDemo}
+            />
+
             <Suspense fallback={<SkeletonVitalsCard />}>
               <VitalsInputSection
                 currentVitals={currentVitals}
@@ -261,47 +294,57 @@ const PatientDashboard = () => {
               <AIInsights insights={aiInsights} />
             </Suspense>
 
+            {/* Vitals History */}
+            <Suspense fallback={<SkeletonCard />}>
+              <VitalsHistory />
+            </Suspense>
+
+            {/* Medication Reminders */}
+            <Suspense fallback={<SkeletonCard />}>
+              <MedicationReminders />
+            </Suspense>
+
             <div className="grid lg:grid-cols-2 gap-6">
               <ReportUpload />
               <ConsultationRequest />
             </div>
 
-            {/* Core System Test - Development Only */}
-            {process.env.NODE_ENV === 'development' && <CoreSystemTest />}
+            {/* Core System Test - Hidden (only shows with ?debug=true in URL) */}
+            {process.env.NODE_ENV === 'development' && new URLSearchParams(window.location.search).get('debug') === 'true' && <CoreSystemTest />}
 
-            {/* Emergency Alert System */}
-            <Card className="border-destructive/20 bg-destructive/5">
-              <CardHeader>
-                <CardTitle className="text-destructive">Emergency Alert System</CardTitle>
-                <CardDescription>
-                  Immediately notify your emergency contact in case of a medical emergency
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex justify-center">
-                <EmergencyButton />
-              </CardContent>
-            </Card>
-
-            <Card>
+            <Card className="animate-fade-in">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <User className="h-5 w-5" />
-                  Profile
+                  Profile Summary
                 </CardTitle>
+                <CardDescription>Your account information</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div>
-                  <p className="text-sm text-muted-foreground">Email</p>
+                <div className="p-3 rounded-lg bg-muted">
+                  <p className="text-xs text-muted-foreground mb-1">Email</p>
                   <p className="font-medium">{profile?.email}</p>
                 </div>
-                {profile?.phone && (
-                  <div>
-                    <p className="text-sm text-muted-foreground">Phone</p>
+                {profile?.phone ? (
+                  <div className="p-3 rounded-lg bg-muted">
+                    <p className="text-xs text-muted-foreground mb-1">Phone</p>
                     <p className="font-medium">{profile.phone}</p>
                   </div>
+                ) : (
+                  <div className="p-3 rounded-lg bg-muted/50 border border-dashed">
+                    <p className="text-xs text-muted-foreground mb-1">Phone</p>
+                    <Button 
+                      variant="link" 
+                      size="sm" 
+                      className="h-auto p-0 text-primary"
+                      onClick={() => navigate('/settings')}
+                    >
+                      Add phone number →
+                    </Button>
+                  </div>
                 )}
-                <div>
-                  <p className="text-sm text-muted-foreground">Monitoring Mode</p>
+                <div className="p-3 rounded-lg bg-muted">
+                  <p className="text-xs text-muted-foreground mb-2">Monitoring Mode</p>
                   <Badge variant={connectedDevice ? "default" : "secondary"}>
                     {connectedDevice ? 'Wearable Connected' : 'AI Assistant Only'}
                   </Badge>
@@ -312,14 +355,29 @@ const PatientDashboard = () => {
 
           {/* Mobile Tabbed View */}
           <Tabs defaultValue="vitals" className="md:hidden">
-            <TabsList className="grid w-full grid-cols-4 mb-4">
+            <TabsList className="grid w-full grid-cols-5 mb-4">
+              <TabsTrigger value="demo" className="text-xs">Demo</TabsTrigger>
               <TabsTrigger value="vitals" className="text-xs">Vitals</TabsTrigger>
               <TabsTrigger value="actions" className="text-xs">Actions</TabsTrigger>
-              <TabsTrigger value="emergency" className="text-xs">Emergency</TabsTrigger>
+              <TabsTrigger value="emergency" className="text-xs">SOS</TabsTrigger>
               <TabsTrigger value="profile" className="text-xs">Profile</TabsTrigger>
             </TabsList>
 
+            <TabsContent value="demo" className="space-y-4 mt-0">
+              <DemoModeControl
+                isActive={demoMode.isActive}
+                updateCount={demoMode.updateCount}
+                scenario={demoMode.scenario}
+                onToggle={demoMode.toggleDemo}
+              />
+            </TabsContent>
+
             <TabsContent value="vitals" className="space-y-4 mt-0">
+              {/* Welcome Card - Mobile */}
+              <WelcomeCard 
+                latestVitals={currentVitals}
+              />
+
               <Suspense fallback={<SkeletonVitalsCard />}>
                 <VitalsInputSection
                   currentVitals={currentVitals}
@@ -341,16 +399,13 @@ const PatientDashboard = () => {
             </TabsContent>
 
             <TabsContent value="emergency" className="space-y-4 mt-0">
-              <Card className="border-destructive/20 bg-destructive/5">
+              <Card className="border-muted bg-muted/50">
                 <CardHeader>
-                  <CardTitle className="text-destructive">Emergency Alert System</CardTitle>
+                  <CardTitle>Emergency Button</CardTitle>
                   <CardDescription>
-                    Immediately notify your emergency contact in case of a medical emergency
+                    The emergency button is now in the top menu for quick access. Tap the menu icon to find it.
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="flex justify-center">
-                  <EmergencyButton />
-                </CardContent>
               </Card>
             </TabsContent>
 

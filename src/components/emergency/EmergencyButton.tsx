@@ -140,21 +140,21 @@ const EmergencyButton = () => {
       return {
         type: 'error',
         title: 'Emergency Alert Failed',
-        message: `Failed to send emergency notification: ${notificationResult.error}. Please contact emergency services directly at 911.`,
+        message: `Failed to send emergency notification: ${notificationResult.error}. Please contact emergency services directly at 115 (Ambulance) or 1122 (Rescue).`,
         icon: XCircle
       };
     } else if (lastResult?.success) {
       return {
         type: 'partial',
         title: 'Emergency Recorded',
-        message: 'Emergency event was recorded but notification may have failed. Please contact emergency services directly at 911 if needed.',
+        message: 'Emergency event was recorded but notification may have failed. Please contact emergency services directly at 115 (Ambulance) or 1122 (Rescue) if needed.',
         icon: AlertTriangle
       };
     } else {
       return {
         type: 'error',
         title: 'Emergency System Error',
-        message: 'Emergency system encountered an error. Please contact emergency services directly at 911.',
+        message: 'Emergency system encountered an error. Please contact emergency services directly at 115 (Ambulance) or 1122 (Rescue).',
         icon: XCircle
       };
     }
@@ -168,7 +168,7 @@ const EmergencyButton = () => {
       <Button
         onClick={handleEmergencyClick}
         disabled={isDisabled}
-        className="bg-destructive hover:bg-destructive/90 text-white font-bold py-4 px-8 text-lg min-h-[60px] shadow-lg"
+        className="bg-destructive hover:bg-destructive/90 text-white font-bold py-4 px-8 text-lg min-h-[60px] shadow-lg animate-pulse-subtle btn-press"
         size="lg"
       >
         <AlertTriangle className="mr-2 h-6 w-6" />
@@ -194,7 +194,7 @@ const EmergencyButton = () => {
                 </p>
               </div>
               <p className="text-sm font-medium text-destructive">
-                ⚠️ This does NOT contact emergency services (911). If this is a life-threatening emergency, call 911 immediately.
+                ⚠️ This does NOT contact emergency services. If this is a life-threatening emergency, call 115 (Ambulance) or 1122 (Rescue) immediately.
               </p>
             </DialogDescription>
           </DialogHeader>
