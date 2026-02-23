@@ -621,6 +621,81 @@ export type Database = {
         }
         Relationships: []
       }
+      tasks: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          description: string | null
+          due_at: string
+          recurrence_rule: string
+          is_completed: boolean
+          completed_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title: string
+          description?: string | null
+          due_at: string
+          recurrence_rule?: string
+          is_completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          description?: string | null
+          due_at?: string
+          recurrence_rule?: string
+          is_completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      memory_journal: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          content: string | null
+          image_urls: string[] | null
+          audio_url: string | null
+          tags: string[] | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title: string
+          content?: string | null
+          image_urls?: string[] | null
+          audio_url?: string | null
+          tags?: string[] | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          content?: string | null
+          image_urls?: string[] | null
+          audio_url?: string | null
+          tags?: string[] | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

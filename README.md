@@ -239,6 +239,7 @@ VITE_SUPABASE_PROJECT_ID=your_project_id
    ```bash
    supabase functions deploy ai-screen-vitals
    supabase functions deploy process-report
+   supabase functions deploy generate-daily-report
    ```
 
 ### Step 5: Run Development Server

@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import DoctorNotesSection from "@/components/doctor/DoctorNotesSection";
+import DailyReportCard from "@/components/patient/DailyReportCard";
 
 interface PatientProfile {
   id: string;
@@ -324,6 +325,11 @@ const PatientDetail = () => {
           <div className="space-y-6">
             {/* Doctor Notes Section */}
             {id && <DoctorNotesSection patientId={id} isDoctor={isDoctor} />}
+
+            {/* Daily report (doctor: generate for this patient) */}
+            {id && isDoctor && (
+              <DailyReportCard patientId={id} compact />
+            )}
 
             {/* Review Status */}
             <Card>

@@ -15,6 +15,9 @@ import ConsultationRequest from "@/components/patient/ConsultationRequest";
 import VitalsInputSection from "@/components/patient/VitalsInputSection";
 import VitalsHistory from "@/components/patient/VitalsHistory";
 import MedicationReminders from "@/components/patient/MedicationReminders";
+import DailyReportCard from "@/components/patient/DailyReportCard";
+import DailyTaskManager from "@/components/patient/DailyTaskManager";
+import MemoryJournal from "@/components/patient/MemoryJournal";
 import WelcomeCard from "@/components/dashboard/WelcomeCard";
 import FeedbackButton from "@/components/feedback/FeedbackButton";
 import { useSessionTracking } from "@/hooks/useSessionTracking";
@@ -304,6 +307,20 @@ const PatientDashboard = () => {
               <MedicationReminders />
             </Suspense>
 
+            {/* Daily Task Manager */}
+            <Suspense fallback={<SkeletonCard />}>
+              <DailyTaskManager />
+            </Suspense>
+
+            {/* Memory Journal */}
+            <Suspense fallback={<SkeletonCard />}>
+              <MemoryJournal />
+            </Suspense>
+
+            <Suspense fallback={<SkeletonCard />}>
+              <DailyReportCard />
+            </Suspense>
+
             <div className="grid lg:grid-cols-2 gap-6">
               <ReportUpload />
               <ConsultationRequest />
@@ -394,6 +411,9 @@ const PatientDashboard = () => {
             </TabsContent>
 
             <TabsContent value="actions" className="space-y-4 mt-0">
+              <DailyTaskManager />
+              <MemoryJournal />
+              <DailyReportCard />
               <ReportUpload />
               <ConsultationRequest />
             </TabsContent>
